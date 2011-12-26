@@ -26,5 +26,5 @@ void codeblocksProjectFile::addInclude(string includeName){
     appendValue(doc, "Add", "directory", includeName);
 }  
 void codeblocksProjectFile::addLibrary(string libraryName){
-  appendValue(doc, "Add", "library", libraryName);
+   appendValue(doc, "Add", "library", libraryName);
 }

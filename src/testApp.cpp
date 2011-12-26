@@ -24,7 +24,10 @@ void testApp::setup(){
     VSP.loadFile("visualstudio_windows/emptyExample.vcxproj");
     VSP.addInclude("test");
     VSP.addLibrary("../../../addons/opencv/opencv.a");
- 
+    VSP.addSrc("src/testApp.h");
+    VSP.addSrc("src/blah.h");
+    VSP.addSrc("src/blah.cpp");
+    VSP.saveFile("visualstudio_windows/emptyExample2.vcxproj");
 //    
 //    addSrc(doc, "src/testApp.cpp");
 //    addSrc(doc, "testApp3.cpp");

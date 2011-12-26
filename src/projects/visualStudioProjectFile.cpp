@@ -28,10 +28,14 @@ void visualStudioProjectFile::saveFile(string fileName){
 
 void visualStudioProjectFile::addSrc(string srcFile){
     
+    if (ofIsStringInString(srcFile, ".h") || ofIsStringInString(srcFile, ".hpp")){
+        appendValue(doc, "ClInclude", "Include", srcFile);
+    } else {
+        appendValue(doc, "ClCompile", "Include", srcFile);
+    }
     
-    
-    //appendValue(doc, "Unit", "filename", srcFile);
 } 
+
 void visualStudioProjectFile::addInclude(string includeName){
    
     pugi::xpath_node_set source = doc.select_nodes("//ClCompile/AdditionalIncludeDirectories");
