@@ -4,7 +4,7 @@
 
 #include "addonsParser.h"
 #include "codeblocksProjectFile.h"
-
+#include "visualStudioProjectFile.h"
 
 
 
@@ -30,6 +30,8 @@ class testApp : public ofBaseApp{
         addonsParser AP;
     
         codeblocksProjectFile CBP;
+        visualStudioProjectFile VSP;
     
 		
 };
+

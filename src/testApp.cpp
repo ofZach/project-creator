@@ -19,6 +19,10 @@ void testApp::setup(){
     
     CBP.saveFile("codeblocks_windows/emptyExample2.cbp");
     
+    
+    printf("------ \n");
+    VSP.loadFile("visualstudio_windows/emptyExample.vcxproj");
+    VSP.addInclude("test");
  
 //    
 //    addSrc(doc, "src/testApp.cpp");
