@@ -4,6 +4,10 @@
 #include "visualStudioProjectFile.h"
 
 
+void fixSlashOrder(string & toFix){
+    std::replace(toFix.begin(), toFix.end(),'/', '\\');
+}
+
 
 string unsplitString (vector < string > strings, string deliminator ){
     string result;
@@ -28,6 +32,8 @@ void visualStudioProjectFile::saveFile(string fileName){
 
 void visualStudioProjectFile::addSrc(string srcFile){
     
+    fixSlashOrder(srcFile);
+    
     if (ofIsStringInString(srcFile, ".h") || ofIsStringInString(srcFile, ".hpp")){
         appendValue(doc, "ClInclude", "Include", srcFile);
     } else {
@@ -38,6 +44,9 @@ void visualStudioProjectFile::addSrc(string srcFile){
 
 void visualStudioProjectFile::addInclude(string includeName){
    
+    
+    fixSlashOrder(includeName);
+    
     pugi::xpath_node_set source = doc.select_nodes("//ClCompile/AdditionalIncludeDirectories");
     for (pugi::xpath_node_set::const_iterator it = source.begin(); it != source.end(); ++it){
         //printf("here ?? \n");
@@ -61,6 +70,9 @@ void visualStudioProjectFile::addInclude(string includeName){
 }  
 void visualStudioProjectFile::addLibrary(string libraryName){
 
+    
+    fixSlashOrder(libraryName);
+    
     // ok first, split path and library name.  
     size_t found = libraryName.find_last_of("/");
     string libFolder = libraryName.substr(0,found);
