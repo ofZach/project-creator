@@ -4,6 +4,7 @@
 #include "visualStudioProjectFile.h"
 
 
+
 string unsplitString (vector < string > strings, string deliminator ){
     string result;
     for (int i = 0; i < strings.size(); i++){
@@ -47,12 +48,62 @@ void visualStudioProjectFile::addInclude(string includeName){
         }
         if (bAdd == true){
             strings.push_back(includeName);
+            string includesNew = unsplitString(strings, ";");
+            node.node().first_child().set_value(includesNew.c_str());
         }
-        string includesNew = unsplitString(strings, ";");
-        node.node().first_child().set_value(includesNew.c_str());
+       
     }
     //appendValue(doc, "Add", "directory", includeName);
 }  
 void visualStudioProjectFile::addLibrary(string libraryName){
-    //appendValue(doc, "Add", "library", libraryName);
+
+    // ok first, split path and library name.  
+    size_t found = libraryName.find_last_of("/");
+    string libFolder = libraryName.substr(0,found);
+    string libName = libraryName.substr(found+1);
+    
+    // do the path, then the library
+    
+    // paths for libraries
+    pugi::xpath_node_set source = doc.select_nodes("//Link/AdditionalLibraryDirectories");
+    for (pugi::xpath_node_set::const_iterator it = source.begin(); it != source.end(); ++it){
+        pugi::xpath_node node = *it;
+        string includes = node.node().first_child().value();
+        vector < string > strings = ofSplitString(includes, ";");
+        bool bAdd = true;
+        for (int i = 0; i < strings.size(); i++){
+            if (strings[i].compare(libFolder) == 0){
+                bAdd = false;
+            }
+        }
+        if (bAdd == true){
+            strings.push_back(libFolder);
+            string libPathsNew = unsplitString(strings, ";");
+            cout << libPathsNew << endl;
+            node.node().first_child().set_value(libPathsNew.c_str());
+        }
+    }
+    
+    // libs
+    source = doc.select_nodes("//Link/AdditionalDependencies");
+    for (pugi::xpath_node_set::const_iterator it = source.begin(); it != source.end(); ++it){
+        pugi::xpath_node node = *it;
+        string includes = node.node().first_child().value();
+        vector < string > strings = ofSplitString(includes, ";");
+        bool bAdd = true;
+        for (int i = 0; i < strings.size(); i++){
+            if (strings[i].compare(libName) == 0){
+                bAdd = false;
+            }
+        }
+        if (bAdd == true){
+            strings.push_back(libName);
+            string libsNew = unsplitString(strings, ";");
+            cout << libsNew << endl;
+            node.node().first_child().set_value(libsNew.c_str());
+        }
+       
+    }
+
+
 }

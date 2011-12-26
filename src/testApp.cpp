@@ -23,6 +23,7 @@ void testApp::setup(){
     printf("------ \n");
     VSP.loadFile("visualstudio_windows/emptyExample.vcxproj");
     VSP.addInclude("test");
+    VSP.addLibrary("../../../addons/opencv/opencv.a");
  
 //    
 //    addSrc(doc, "src/testApp.cpp");
