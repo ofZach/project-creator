@@ -7,8 +7,9 @@
 void testApp::setup(){
 
     
-    AP.loadAddons();
+    //AP.loadAddons();
     
+    /*
     CBP.loadFile("codeblocks_windows/emptyExample.cbp");
     
     CBP.addSrc( "src/testApp.cpp");
@@ -28,6 +29,12 @@ void testApp::setup(){
     VSP.addSrc("src/blah.h");
     VSP.addSrc("src/blah.cpp");
     VSP.saveFile("visualstudio_windows/emptyExample2.vcxproj");
+    
+    */
+    XCP.loadFile("xcode/emptyExample.xcodeproj/project.pbxproj");
+    XCP.addSrc("blah.c");
+    
+    
 //    
 //    addSrc(doc, "src/testApp.cpp");
 //    addSrc(doc, "testApp3.cpp");

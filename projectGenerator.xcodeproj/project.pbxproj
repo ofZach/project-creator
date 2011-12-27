@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1193192F14AA470F0066A05C /* xcodeProjectFile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1193192E14AA470F0066A05C /* xcodeProjectFile.cpp */; };
 		119B95D914A65CA0001E1E20 /* libpugixml.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 119B95D314A65CA0001E1E20 /* libpugixml.a */; };
 		119B95DA14A65CA0001E1E20 /* libpugixml_d.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 119B95D414A65CA0001E1E20 /* libpugixml_d.a */; };
 		11D6814C14A8EC0F008E3E3D /* addonsParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 11D6814314A8EC0F008E3E3D /* addonsParser.cpp */; };
@@ -63,6 +64,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		1193192714AA1F930066A05C /* xcodeProjectFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = xcodeProjectFile.h; sourceTree = "<group>"; };
+		1193192E14AA470F0066A05C /* xcodeProjectFile.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = xcodeProjectFile.cpp; sourceTree = "<group>"; };
 		119B95D314A65CA0001E1E20 /* libpugixml.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libpugixml.a; sourceTree = "<group>"; };
 		119B95D414A65CA0001E1E20 /* libpugixml_d.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libpugixml_d.a; sourceTree = "<group>"; };
 		119B95D614A65CA0001E1E20 /* foreach.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = foreach.hpp; sourceTree = "<group>"; };
@@ -164,6 +167,8 @@
 				11D6814914A8EC0F008E3E3D /* codeblocksProjectFile.h */,
 				11D6814A14A8EC0F008E3E3D /* visualStudioProjectFile.cpp */,
 				11D6814B14A8EC0F008E3E3D /* visualStudioProjectFile.h */,
+				1193192714AA1F930066A05C /* xcodeProjectFile.h */,
+				1193192E14AA470F0066A05C /* xcodeProjectFile.cpp */,
 			);
 			path = projects;
 			sourceTree = "<group>";
@@ -344,6 +349,7 @@
 				11D6814D14A8EC0F008E3E3D /* baseProjectFile.cpp in Sources */,
 				11D6814E14A8EC0F008E3E3D /* codeblocksProjectFile.cpp in Sources */,
 				11D6814F14A8EC0F008E3E3D /* visualStudioProjectFile.cpp in Sources */,
+				1193192F14AA470F0066A05C /* xcodeProjectFile.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
