@@ -1,24 +1,8 @@
 #pragma once
 
 #include "ofMain.h"
-
-
-
-
-class ofAddon {
-    
-public: 
-
-    // this is source files:
-    map < string, string > filesToFolders;      //the addons has had, for each file, 
-                                                //sometimes a listing of what folder to put it in, such as "addons/ofxOsc/src"
-        
-    vector < string > srcFilesToAdd;
-    vector < string > libsToAdd;
-    vector < string > includePathsToAdd;
-    
-};
-
+#include "CBLinuxProject.h"
+#include "CBWinProject.h"
 
 
 class testApp : public ofBaseApp{
@@ -38,4 +22,7 @@ class testApp : public ofBaseApp{
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
 		
+		CBLinuxProject linuxProject;
+		CBWinProject winProject;
+
 };
