@@ -98,6 +98,14 @@ void getLibsRecursively(const string & path, vector < string > & libFiles, vecto
 
 }
 
+
+static string OFRoot = "../../..";
+
 string getOFRoot(){
-	return ofFilePath::removeTrailingSlash("/home/arturo/Escritorio/openFrameworks");
+	return ofFilePath::removeTrailingSlash(OFRoot);
+}
+
+
+void setOFRoot(string path){
+	OFRoot = path;
 }

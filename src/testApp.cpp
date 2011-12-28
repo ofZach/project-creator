@@ -3,6 +3,8 @@
 
 //--------------------------------------------------------------
 void testApp::setup(){
+	setOFRoot("/home/arturo/Escritorio/openFrameworks");
+
 	ofSetLogLevel(CBLinuxProject::LOG_NAME,OF_LOG_VERBOSE);
 	linuxProject.create("/home/arturo/Escritorio/openFrameworks/apps/testApp/testCreatorLinux");
 	ofAddon addon("/home/arturo/Escritorio/openFrameworks/addons/ofxOpenCv","linux");

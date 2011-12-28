@@ -14,6 +14,7 @@
 
 
 string getOFRoot();
+void setOFRoot(string path);
 
 bool doesTagAndAttributeExist(pugi::xml_document & doc, string tag, string attribute, string newValue);
 pugi::xml_node appendValue(pugi::xml_document & doc, string tag, string attribute, string newValue);
