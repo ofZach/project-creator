@@ -24,4 +24,8 @@ void getFilesRecursively(const string & path, vector < string > & fileNames);
 void getLibsRecursively(const string & path, vector < string > & libFiles, vector < string > & libLibs, string platform="" );
 
 
+
+void fixSlashOrder(string & toFix);
+string unsplitString (vector < string > strings, string deliminator );
+
 #endif /* UTILS_H_ */

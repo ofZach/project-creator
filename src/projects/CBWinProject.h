@@ -11,19 +11,24 @@
 #include "ofConstants.h"
 #include "pugixml.hpp"
 #include "ofAddon.h"
+#include "baseProject.h"
 
-class CBWinProject {
+class CBWinProject: public baseProject  {
 public:
 	CBWinProject();
 
 	bool load(string path);
 	bool create(string path);
+	bool save(string path){return true;}
 
 	void addSrc(string srcName, string folder);
 	void addInclude(string includeName);
 	void addLibrary(string libraryName);
 
 	void addAddon(ofAddon & addon);
+
+	string getName();
+	string getPath();
 
 	static string LOG_NAME;
 

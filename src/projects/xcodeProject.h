@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "baseProjectFile.h"
+#include "baseProject.h"
 
 
 class xcodeSrcFile {
@@ -30,16 +30,23 @@ public:
 } ;
 
 
-class xcodeProjectFile : public baseProjectFile {
+class xcodeProject : public baseProject {
     
 public: 
     
-    void loadFile(string fileName);
-    void saveFile(string fileName);
-    void addSrc(string srcFile);
+    bool load(string path);
+    bool create(string path);
+	bool save(string path);
+
+    void addSrc(string srcFile, string folder);
     void addInclude(string includeName);
     void addLibrary(string libraryName);
-    
+
+	void addAddon(ofAddon & addon);
+
+	string getName();
+	string getPath();
+
     // adding src is hard, here's some help
     vector < xcodeSrcFile > srcFiles;
     void parseForSrc();

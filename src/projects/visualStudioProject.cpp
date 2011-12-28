@@ -1,36 +1,63 @@
 
 
 
-#include "visualStudioProjectFile.h"
+#include "visualStudioProject.h"
+#include "Utils.h"
+
+string visualStudioProject::LOG_NAME = "visualStudioProjectFile";
 
 
-void fixSlashOrder(string & toFix){
-    std::replace(toFix.begin(), toFix.end(),'/', '\\');
-}
 
+bool visualStudioProject::load(string path){
+	projectDir = ofFilePath::addLeadingSlash(path);
+	projectName = ofFilePath::getFileName(path);
+	ofFile project(projectDir + projectName + ".vcxproj");
+	if(!project.exists()){
+		ofLogError(LOG_NAME) << "error loading" << path << "doesn't exist";
+		return false;
+	}
 
-string unsplitString (vector < string > strings, string deliminator ){
-    string result;
-    for (int i = 0; i < strings.size(); i++){
-        if (i != 0) result += deliminator;
-        result += strings[i];
-    }
-    return result;
-}
+	pugi::xml_parse_result result = doc.load(project);
 
-
-void visualStudioProjectFile::loadFile(string fileName){
-    pugi::xml_parse_result result = doc.load_file(ofToDataPath(fileName).c_str());
-    // todo check result here
-    bLoaded = true;
+    bLoaded = result.status==pugi::status_ok;
+    return bLoaded;
 }  
 
 
-void visualStudioProjectFile::saveFile(string fileName){
-    doc.save_file(ofToDataPath(fileName).c_str());
+bool visualStudioProject::save(string fileName){
+    return doc.save_file(ofToDataPath(fileName).c_str());
 }  
 
-void visualStudioProjectFile::addSrc(string srcFile){
+bool visualStudioProject::create(string path){
+	projectDir = ofFilePath::addTrailingSlash(path);
+	ofLogVerbose(LOG_NAME) << "project dir:" << projectDir;
+	projectName = ofFilePath::getFileName(path);
+	ofLogVerbose(LOG_NAME) << "project name:" << projectName;
+	ofFile project(projectDir + projectName + ".vcxproj");
+	if(!project.exists()){
+		ofLogVerbose(LOG_NAME) << "creating non existent project";
+		ofDirectory dir(projectDir);
+		dir.create(true);
+		ofFile::copyFromTo(getOFRoot()+"/scripts/vs2010/template/emptyExample_vs2010.vcxproj",project.path());
+		ofFile::copyFromTo(getOFRoot()+"/scripts/vs2010/template/emptyExample_vs2010.vcxproj.user",projectDir + projectName + ".vcxproj.user");
+		ofFile::copyFromTo(getOFRoot()+"/scripts/vs2010/template/emptyExample_vs2010.sln",projectDir + projectName + ".sln");
+		ofFile::copyFromTo(getOFRoot()+"/scripts/vs2010/template/src",projectDir);
+		ofFile::copyFromTo(getOFRoot()+"/scripts/vs2010/template/bin",projectDir);
+		project.open(projectDir + projectName + ".vcxproj");
+	}
+
+	pugi::xml_parse_result result = doc.load(project);
+	if(result.status==pugi::status_ok){
+		//TODO: change project name in xml and save
+		//doc.save_file((projectDir + projectName + ".cbp").c_str());
+		bLoaded = true;
+	}else{
+		bLoaded = false;
+	}
+	return bLoaded;
+}
+
+void visualStudioProject::addSrc(string srcFile, string folder){
     
     fixSlashOrder(srcFile);
     
@@ -42,7 +69,7 @@ void visualStudioProjectFile::addSrc(string srcFile){
     
 } 
 
-void visualStudioProjectFile::addInclude(string includeName){
+void visualStudioProject::addInclude(string includeName){
    
     
     fixSlashOrder(includeName);
@@ -54,7 +81,7 @@ void visualStudioProjectFile::addInclude(string includeName){
         string includes = node.node().first_child().value();
         vector < string > strings = ofSplitString(includes, ";");
         bool bAdd = true;
-        for (int i = 0; i < strings.size(); i++){
+        for (int i = 0; i < (int)strings.size(); i++){
             if (strings[i].compare(includeName) == 0){
                 bAdd = false;
             }
@@ -68,7 +95,7 @@ void visualStudioProjectFile::addInclude(string includeName){
     }
     //appendValue(doc, "Add", "directory", includeName);
 }  
-void visualStudioProjectFile::addLibrary(string libraryName){
+void visualStudioProject::addLibrary(string libraryName){
 
     
     fixSlashOrder(libraryName);
@@ -87,7 +114,7 @@ void visualStudioProjectFile::addLibrary(string libraryName){
         string includes = node.node().first_child().value();
         vector < string > strings = ofSplitString(includes, ";");
         bool bAdd = true;
-        for (int i = 0; i < strings.size(); i++){
+        for (int i = 0; i < (int)strings.size(); i++){
             if (strings[i].compare(libFolder) == 0){
                 bAdd = false;
             }
@@ -107,7 +134,7 @@ void visualStudioProjectFile::addLibrary(string libraryName){
         string includes = node.node().first_child().value();
         vector < string > strings = ofSplitString(includes, ";");
         bool bAdd = true;
-        for (int i = 0; i < strings.size(); i++){
+        for (int i = 0; i < (int)strings.size(); i++){
             if (strings[i].compare(libName) == 0){
                 bAdd = false;
             }
@@ -123,3 +150,25 @@ void visualStudioProjectFile::addLibrary(string libraryName){
 
 
 }
+
+
+void visualStudioProject::addAddon(ofAddon & addon){
+	for(int i=0;i<(int)addon.includePaths.size();i++){
+		addInclude(addon.includePaths[i]);
+	}
+	for(int i=0;i<(int)addon.libs.size();i++){
+		addLibrary(addon.libs[i]);
+	}
+	for(int i=0;i<(int)addon.srcFiles.size();i++){
+		addSrc(addon.srcFiles[i],addon.filesToFolders[addon.srcFiles[i]]);
+	}
+}
+
+string visualStudioProject::getName(){
+	return projectName;
+}
+
+string visualStudioProject::getPath(){
+	return projectDir;
+}
+

@@ -1,22 +1,22 @@
 /*
- * CBWinProject.cpp
+ * CBLinuxProject.cpp
  *
  *  Created on: 28/12/2011
  *      Author: arturo
  */
 
-#include "CBWinProject.h"
+#include "CBLinuxProject.h"
 #include "ofFileUtils.h"
 #include "ofLog.h"
 #include "Utils.h"
 
-string CBWinProject::LOG_NAME = "CBWinProject";
+string CBLinuxProject::LOG_NAME = "CBLinuxProject";
 
-CBWinProject::CBWinProject() {
+CBLinuxProject::CBLinuxProject() {
 
 }
 
-void CBWinProject::parseAddons(){
+void CBLinuxProject::parseAddons(){
 	addons.clear();
 	ofFile addonsmake(projectDir+"addons.make");
 	if(!addonsmake.exists()){
@@ -28,13 +28,13 @@ void CBWinProject::parseAddons(){
 	while(!addonsmakebuff.isLastLine()){
 		string line = addonsmakebuff.getNextLine();
 		if(line!=""){
-			addons.push_back(ofAddon(getOFRoot()+"/addons/"+line,"win_cb"));
+			addons.push_back(ofAddon(getOFRoot()+"/addons/"+line,"linux"));
 		}
 	}
 }
 
 
-bool CBWinProject::load(string path){
+bool CBLinuxProject::load(string path){
 	projectDir = ofFilePath::addLeadingSlash(path);
 	projectName = ofFilePath::getFileName(path);
 	ofFile project(projectDir + projectName + ".cbp");
@@ -44,10 +44,11 @@ bool CBWinProject::load(string path){
 	}
 	parseAddons();
 	pugi::xml_parse_result result = doc.load(project);
-	return result.status==pugi::status_ok;
+	bLoaded =result.status==pugi::status_ok;
+	return bLoaded;
 }
 
-bool CBWinProject::create(string path){
+bool CBLinuxProject::create(string path){
 	projectDir = ofFilePath::addTrailingSlash(path);
 	ofLogVerbose(LOG_NAME) << "project dir:" << projectDir;
 	projectName = ofFilePath::getFileName(path);
@@ -57,8 +58,10 @@ bool CBWinProject::create(string path){
 		ofLogVerbose(LOG_NAME) << "creating non existent project";
 		ofDirectory dir(projectDir);
 		dir.create(true);
-		ofFile::copyFromTo(getOFRoot()+"/scripts/win_cb/template/emptyExample_win_cb.cbp",project.path());
-		ofFile::copyFromTo(getOFRoot()+"/scripts/win_cb/template/emptyExample_win_cb.workspace",projectDir + projectName + ".workspace");
+		ofFile::copyFromTo(getOFRoot()+"/scripts/linux/template/emptyExample_linux.cbp",project.path());
+		ofFile::copyFromTo(getOFRoot()+"/scripts/linux/template/emptyExample_linux.workspace",projectDir + projectName + ".workspace");
+		ofFile::copyFromTo(getOFRoot()+"/scripts/linux/template/Makefile",projectDir);
+		ofFile::copyFromTo(getOFRoot()+"/scripts/linux/template/config.make",projectDir);
 		ofFile::copyFromTo(getOFRoot()+"/scripts/linux/template/src",projectDir);
 		ofFile::copyFromTo(getOFRoot()+"/scripts/linux/template/bin",projectDir);
 		project.open(projectDir + projectName + ".cbp");
@@ -70,17 +73,19 @@ bool CBWinProject::create(string path){
         if(!title.empty()){
         	if(!title[0].node().attribute("title").set_value(projectName.c_str())){
         		ofLogError(LOG_NAME) << "cannot set title";
-        		return false;
+        		bLoaded = false;
+        		return bLoaded;
         	}
             doc.save_file((projectDir + projectName + ".cbp").c_str());
         }
-		return true;
+		bLoaded = true;
 	}else{
-		return false;
+		bLoaded = false;
 	}
+	return bLoaded;
 }
 
-void CBWinProject::addSrc(string srcName, string folder){
+void CBLinuxProject::addSrc(string srcName, string folder){
 	pugi::xml_node node = appendValue(doc, "Unit", "filename", srcName);
 	if(!node.empty()){
 		node.child("Option").attribute("virtualFolder").set_value(folder.c_str());
@@ -88,29 +93,30 @@ void CBWinProject::addSrc(string srcName, string folder){
     doc.save_file((projectDir + projectName + ".cbp").c_str());
 }
 
-void CBWinProject::addInclude(string includeName){
-    appendValue(doc, "Add", "directory", includeName);
+void CBLinuxProject::addInclude(string includeName){
+    //appendValue(doc, "Add", "directory", includeName);
 }
 
-void CBWinProject::addLibrary(string libraryName){
-    appendValue(doc, "Add", "library", libraryName);
+void CBLinuxProject::addLibrary(string libraryName){
+    //appendValue(doc, "Add", "library", libraryName);
 }
 
 
-void CBWinProject::addAddon(ofAddon & addon){
+void CBLinuxProject::addAddon(ofAddon & addon){
+
+	/*for(int i=0;i<addon.includePaths.size();i++){
+		addInclude(addon.includePaths[i]);
+	}
+
+	for(int i=0;i<addon.libs.size();i++){
+		addLibrary(addon.libs[i]);
+	}*/
+
 	for(int i=0;i<(int)addons.size();i++){
 		if(addons[i].name==addon.name) return;
 	}
 
 	addons.push_back(addon);
-
-	for(int i=0;i<(int)addon.includePaths.size();i++){
-		addInclude(addon.includePaths[i]);
-	}
-
-	for(int i=0;i<(int)addon.libs.size();i++){
-		addLibrary(addon.libs[i]);
-	}
 
 	for(int i=0;i<(int)addon.srcFiles.size();i++){
 		addSrc(addon.srcFiles[i],addon.filesToFolders[addon.srcFiles[i]]);
@@ -122,3 +128,10 @@ void CBWinProject::addAddon(ofAddon & addon){
 	}
 }
 
+string CBLinuxProject::getName(){
+	return projectName;
+}
+
+string CBLinuxProject::getPath(){
+	return projectDir;
+}

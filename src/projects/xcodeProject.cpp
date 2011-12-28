@@ -1,7 +1,7 @@
 
 
 
-#include "xcodeProjectFile.h"
+#include "xcodeProject.h"
 
 
 #include <iostream>
@@ -28,27 +28,32 @@
 
 
 
-void xcodeProjectFile::loadFile(string fileName){
-    pugi::xml_parse_result result = doc.load_file(ofToDataPath(fileName).c_str());
+bool xcodeProject::load(string path){
+    pugi::xml_parse_result result = doc.load_file(ofToDataPath(path).c_str());
     // todo check result here
     bLoaded = true;
     parseForSrc();
+
+	return result.status==pugi::status_ok;
 }  
 
 
 
 
 
-void xcodeProjectFile::saveFile(string fileName){
-    doc.save_file(ofToDataPath(fileName).c_str());
+bool xcodeProject::save(string fileName){
+    return doc.save_file(ofToDataPath(fileName).c_str());
+
 }  
 
 
+bool xcodeProject::create(string fileName){
+	return true;
+}
 
 
 
-
-bool xcodeProjectFile::findArrayForUUID(string UUID, pugi::xml_node & nodeMe){
+bool xcodeProject::findArrayForUUID(string UUID, pugi::xml_node & nodeMe){
     char query[255];
     sprintf(query, "//string[contains(.,'%s')]", UUID.c_str());
     pugi::xpath_node_set uuidSet = doc.select_nodes(query);
@@ -64,7 +69,7 @@ bool xcodeProjectFile::findArrayForUUID(string UUID, pugi::xml_node & nodeMe){
     return false;
 }
 
-void xcodeProjectFile::parseForSrc(){
+void xcodeProject::parseForSrc(){
     
    
     srcFiles.clear();
@@ -98,7 +103,7 @@ void xcodeProjectFile::parseForSrc(){
         }
     }
     
-    for (int i = 0; i < srcFiles.size(); i++){
+    for (int i = 0; i < (int)srcFiles.size(); i++){
         // one is an "array", the second 
         
         char query[255];
@@ -169,7 +174,7 @@ string generateUUID(){
 
 
 
-void xcodeProjectFile::addSrc(string srcFile){
+void xcodeProject::addSrc(string srcFile, string folder){
     
     
    
@@ -267,9 +272,21 @@ void xcodeProjectFile::addSrc(string srcFile){
     
 } 
 
-void xcodeProjectFile::addInclude(string includeName){
+void xcodeProject::addInclude(string includeName){
     
 }  
-void xcodeProjectFile::addLibrary(string libraryName){
+void xcodeProject::addLibrary(string libraryName){
         
+}
+
+void xcodeProject::addAddon(ofAddon & addon){
+
+}
+
+string xcodeProject::getName(){
+
+}
+
+string xcodeProject::getPath(){
+
 }

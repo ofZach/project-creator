@@ -3,6 +3,7 @@
 #include "ofMain.h"
 #include "CBLinuxProject.h"
 #include "CBWinProject.h"
+#include "visualStudioProject.h"
 
 
 class testApp : public ofBaseApp{
@@ -24,5 +25,6 @@ class testApp : public ofBaseApp{
 		
 		CBLinuxProject linuxProject;
 		CBWinProject winProject;
-
+		visualStudioProject vsProject;
+		xcodeProject xcProject;
 };

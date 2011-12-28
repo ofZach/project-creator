@@ -7,6 +7,7 @@
 
 #include "Utils.h"
 
+#include <algorithm>
 #include <Poco/DirectoryIterator.h>
 #include <Poco/DateTimeFormatter.h>
 #include <Poco/LocalDateTime.h>
@@ -96,6 +97,22 @@ void getLibsRecursively(const string & path, vector < string > & libFiles, vecto
             }
         }
 
+}
+
+
+
+void fixSlashOrder(string & toFix){
+    std::replace(toFix.begin(), toFix.end(),'/', '\\');
+}
+
+
+string unsplitString (vector < string > strings, string deliminator ){
+    string result;
+    for (int i = 0; i < (int)strings.size(); i++){
+        if (i != 0) result += deliminator;
+        result += strings[i];
+    }
+    return result;
 }
 
 

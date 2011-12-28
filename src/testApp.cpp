@@ -1,18 +1,27 @@
 #include "testApp.h"
-
+#include "Utils.h"
 
 //--------------------------------------------------------------
 void testApp::setup(){
 	setOFRoot("/home/arturo/Escritorio/openFrameworks");
 
 	ofSetLogLevel(CBLinuxProject::LOG_NAME,OF_LOG_VERBOSE);
-	linuxProject.create("/home/arturo/Escritorio/openFrameworks/apps/testApp/testCreatorLinux");
-	ofAddon addon("/home/arturo/Escritorio/openFrameworks/addons/ofxOpenCv","linux");
+	linuxProject.create(getOFRoot()+"/apps/testApp/testCreatorLinux");
+	ofAddon addon(getOFRoot()+"/addons/ofxOpenCv","linux");
 	linuxProject.addAddon(addon);
 
-	winProject.create("/home/arturo/Escritorio/openFrameworks/apps/testApp/testCreatorWin");
-	addon.fromFS("/home/arturo/Escritorio/openFrameworks/addons/ofxOpenCv","win_cb");
+	winProject.create(getOFRoot()+"/apps/testApp/testCreatorWin");
+	addon.fromFS(getOFRoot()+"/addons/ofxOpenCv","win_cb");
 	winProject.addAddon(addon);
+
+	vsProject.create(getOFRoot()+"/apps/testApp/testCreatorVS");
+	addon.fromFS(getOFRoot()+"/addons/ofxOpenCv","vs2010");
+	vsProject.addAddon(addon);
+	vsProject.save(getOFRoot()+"/apps/testApp/testCreatorVS/testCreatorVS.vcxproj");
+
+	xcProject.load("xcode/emptyExample.xcodeproj/project.pbxproj");
+	xcProject.addSrc("src/blah.h","src");
+	xcProject.save("xcode/emptyExample.xcodeproj/project2.pbxproj");
 }
 
 
