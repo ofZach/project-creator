@@ -9,7 +9,8 @@ class xcodeSrcFile {
     
     
 public: 
-    
+    xcodeSrcFile(){
+    };
     ~xcodeSrcFile(){};
     string UUID;
     string fileName;

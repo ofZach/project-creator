@@ -32,8 +32,8 @@ void testApp::setup(){
     
     */
     XCP.loadFile("xcode/emptyExample.xcodeproj/project.pbxproj");
-    XCP.addSrc("blah.c");
-    
+    XCP.addSrc("src/blah.h");
+     XCP.saveFile("xcode/emptyExample.xcodeproj/project2.pbxproj");
     
 //    
 //    addSrc(doc, "src/testApp.cpp");

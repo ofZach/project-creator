@@ -66,6 +66,7 @@ bool xcodeProjectFile::findArrayForUUID(string UUID, pugi::xml_node & nodeMe){
 
 void xcodeProjectFile::parseForSrc(){
     
+   
     srcFiles.clear();
     
     pugi::xpath_node_set source = doc.select_nodes("//string/text()");
@@ -132,11 +133,8 @@ void xcodeProjectFile::parseForSrc(){
         }
     }
     
-    
+    /*
     // now, let's output everything!
-    
-    
-
     for (int i = 0; i < srcFiles.size(); i++){
         printf("----------------------------------------- \n");
         cout << srcFiles[i].fileName << " " << srcFiles[i].filePath << endl;
@@ -152,7 +150,21 @@ void xcodeProjectFile::parseForSrc(){
         printf("-- buildRef array -- \n");
         srcFiles[i].buildRefArrayNode.print(std::cout);
     }
+    */
 
+}
+
+string generateUUID(){
+    ofSeedRandom(ofGetUnixTime());
+    char UPPER_DIGITS[16] = {
+        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+        'A', 'B', 'C', 'D', 'E', 'F',
+    };
+    string result;
+    for (int i= 0; i < 24; i++){
+        result += UPPER_DIGITS[(int)ofRandom(0,10000000) % 16];
+    }
+    return result;
 }
 
 
@@ -161,7 +173,42 @@ void xcodeProjectFile::addSrc(string srcFile){
     
     
    
+    if (ofIsStringInString(srcFile, ".h") || 
+        ofIsStringInString(srcFile, ".hpp")  ){
+        
+        // assume that the 3rd item in the src files is "testApp.h" -- this might not be the case
+        xcodeSrcFile testAppH = srcFiles[2];
+        
+        string UUID = generateUUID();
     
+        string srcFolder, srcName;
+        if (ofIsStringInString(srcFile, "/")){
+            size_t found = srcFile.find_last_of("/");
+            srcFolder    = srcFile; //srcFile.substr(0,found);
+            srcName      = srcFile.substr(found+1);
+        } else {
+            srcFolder    = srcFile;
+            srcName      = srcFile;
+        }
+        
+        // add a node with this info
+        pugi::xml_node added = testAppH.srcNode.parent().insert_copy_after(testAppH.srcNode,testAppH.srcNode);
+        pugi::xpath_node_set set = added.select_nodes("string[4]");
+        set.begin()->node().first_child().set_value(srcName.c_str());
+        set = added.select_nodes("string[5]");
+        set.begin()->node().first_child().set_value(srcFolder.c_str());
+        
+        // add a key with a generated UUID
+        pugi::xml_node key = testAppH.srcNode.previous_sibling();
+        pugi::xml_node addedKey = testAppH.srcNode.parent().insert_copy_before(key,added);
+        addedKey.first_child().set_value(UUID.c_str());
+        
+        // add it to the SOURCE array: 
+        
+        
+    } else {
+        
+    }
     
     // so we want to throw into the array, 
     // and duplicate this fileRef
