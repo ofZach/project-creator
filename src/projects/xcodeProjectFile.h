@@ -4,6 +4,31 @@
 
 #include "baseProjectFile.h"
 
+
+class xcodeSrcFile {
+    
+    
+public: 
+    
+    ~xcodeSrcFile(){};
+    string UUID;
+    string fileName;
+    string filePath;
+    
+    string buildRefUUID;
+    
+    // I appear a few places. 
+    
+    pugi::xml_node srcNode;
+    pugi::xml_node srcArrayNode;
+    pugi::xml_node buildRefNode;
+    pugi::xml_node buildRefArrayNode;
+    
+    
+    
+} ;
+
+
 class xcodeProjectFile : public baseProjectFile {
     
 public: 
@@ -13,6 +38,11 @@ public:
     void addSrc(string srcFile);
     void addInclude(string includeName);
     void addLibrary(string libraryName);
+    
+    // adding src is hard, here's some help
+    vector < xcodeSrcFile > srcFiles;
+    void parseForSrc();
+    bool findArrayForUUID(string UUID, pugi::xml_node & nodeMe);
     
 };
 

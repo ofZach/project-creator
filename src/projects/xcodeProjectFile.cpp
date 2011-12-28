@@ -6,24 +6,24 @@
 
 #include <iostream>
 
-const char* node_types[] =
-{
-    "null", "document", "element", "pcdata", "cdata", "comment", "pi", "declaration"
-};
-
-//[code_traverse_walker_impl
-struct simple_walker: pugi::xml_tree_walker
-{
-    virtual bool for_each(pugi::xml_node& node)
-    {
-        for (int i = 0; i < depth(); ++i) std::cout << "  "; // indentation
-        
-        std::cout << node_types[node.type()] << ": name='" << node.name() << "', value='" << node.value() << "'\n";
-        
-        return true; // continue traversal
-    }
-};
-//]
+//const char* node_types[] =
+//{
+//    "null", "document", "element", "pcdata", "cdata", "comment", "pi", "declaration"
+//};
+//
+////[code_traverse_walker_impl
+//struct simple_walker: pugi::xml_tree_walker
+//{
+//    virtual bool for_each(pugi::xml_node& node)
+//    {
+//        for (int i = 0; i < depth(); ++i) std::cout << "  "; // indentation
+//        
+//        std::cout << node_types[node.type()] << ": name='" << node.name() << "', value='" << node.value() << "'\n";
+//        
+//        return true; // continue traversal
+//    }
+//};
+////]
 
 
 
@@ -32,6 +32,7 @@ void xcodeProjectFile::loadFile(string fileName){
     pugi::xml_parse_result result = doc.load_file(ofToDataPath(fileName).c_str());
     // todo check result here
     bLoaded = true;
+    parseForSrc();
 }  
 
 
@@ -46,35 +47,127 @@ void xcodeProjectFile::saveFile(string fileName){
 
 
 
-void xcodeProjectFile::addSrc(string srcFile){
+
+bool xcodeProjectFile::findArrayForUUID(string UUID, pugi::xml_node & nodeMe){
+    char query[255];
+    sprintf(query, "//string[contains(.,'%s')]", UUID.c_str());
+    pugi::xpath_node_set uuidSet = doc.select_nodes(query);
+    for (pugi::xpath_node_set::const_iterator it = uuidSet.begin(); it != uuidSet.end(); ++it){
+        pugi::xpath_node node = *it;
+        if (strcmp(node.node().parent().name(), "array") == 0){
+            nodeMe = node.node().parent();
+            
+            return true;
+        } else {
+        }
+    }
+    return false;
+}
+
+void xcodeProjectFile::parseForSrc(){
     
+    srcFiles.clear();
     
     pugi::xpath_node_set source = doc.select_nodes("//string/text()");
+    
     for (pugi::xpath_node_set::const_iterator it = source.begin(); it != source.end(); ++it){
-        
         pugi::xpath_node node = *it;
-        
         if (strcmp(node.node().value(),"sourcecode.cpp.cpp") == 0 || 
             strcmp(node.node().value(),"sourcecode.c.h") == 0 ){
-            printf("------- \n");
             
-            // this outputs a node.  useful for checking stuff.
-            //simple_walker walker;
-            //node.node().parent().parent().traverse(walker);
-            //node.node().parent().parent().previous_sibling().traverse(walker);
+            xcodeSrcFile file;
             
             string UUID = string(node.node().parent().parent().previous_sibling().first_child().value());
+            file.UUID = UUID;
+            
+            
             pugi::xpath_node_set set = node.node().parent().parent().select_nodes("string[4]");
-            cout << UUID << " " << set.begin()->node().first_child().value() << endl;
+            file.fileName = set.begin()->node().first_child().value();
+            //cout << UUID << " " << set.begin()->node().first_child().value() << endl;
+            
             set = node.node().parent().parent().select_nodes("string[5]");
-            cout << "path : " << " " << set.begin()->node().first_child().value() << endl;
+            file.filePath = set.begin()->node().first_child().value();
+            //cout << "path : " << " " << set.begin()->node().first_child().value() << endl;
+            
+            //file.nodeHash = node.node().parent().parent().hash_value();
+            //cout << "this nodes hash: " << node.node().parent().parent().hash_value() << endl; 
+            file.srcNode = node.node().parent().parent();
+            srcFiles.push_back(file);
             
         }
     }
-   
+    
+    for (int i = 0; i < srcFiles.size(); i++){
+        // one is an "array", the second 
+        
+        char query[255];
+        sprintf(query,"//string[contains(.,'%s')]",  srcFiles[i].UUID.c_str());
+        
+        pugi::xpath_node_set uuidSet = doc.select_nodes(query);
+        for (pugi::xpath_node_set::const_iterator it = uuidSet.begin(); it != uuidSet.end(); ++it){
+            pugi::xpath_node node = *it;
+            if (strcmp(node.node().parent().name(), "array") == 0){
+                srcFiles[i].srcArrayNode = node.node().parent();
+            } else {
+                // this is the "buildRef"
+                //cout <<  node.node().parent().name() <<endl;
+                //cout << string(node.node().parent().previous_sibling().first_child().value()) << endl;
+                string buildRefUUID = string(node.node().parent().previous_sibling().first_child().value());
+                
+                srcFiles[i].buildRefUUID = buildRefUUID;
+                srcFiles[i].buildRefNode = node.node().parent();
+                
+                pugi::xml_node buildRefArray;
+                findArrayForUUID(buildRefUUID, buildRefArray);
+                //simple_walker walker;
+                //cout << buildRefArray.name() << endl;
+                //buildRefArray.traverse(walker);
+                //buildRefArray.print(std::cout);
+                
+                srcFiles[i].buildRefArrayNode = buildRefArray;
+                // this array is what gets built.
+                // let's get the array associated with this build ref UUID
+                
+            }
+        }
+    }
+    
+    
+    // now, let's output everything!
+    
+    
+
+    for (int i = 0; i < srcFiles.size(); i++){
+        printf("----------------------------------------- \n");
+        cout << srcFiles[i].fileName << " " << srcFiles[i].filePath << endl;
+        cout << srcFiles[i].UUID << endl;
+        printf("-- src node -- \n");
+        srcFiles[i].srcNode.print(std::cout);
+        printf("-- src array -- \n");
+        srcFiles[i].srcArrayNode.print(std::cout);
+        printf("--------- ref info \n");
+        cout << srcFiles[i].buildRefUUID << endl;
+        printf("-- buildRef node -- \n");
+        srcFiles[i].buildRefNode.print(std::cout);
+        printf("-- buildRef array -- \n");
+        srcFiles[i].buildRefArrayNode.print(std::cout);
+    }
+
+}
+
+
+
+void xcodeProjectFile::addSrc(string srcFile){
+    
     
    
-    /*
+    
+    
+    // so we want to throw into the array, 
+    // and duplicate this fileRef
+    // the fileRef also gets added to a build step if this is a .cpp file. 
+    
+     /*
      // source files appear here: 
      <key>E4B69E1C0A3A1BDC003C02F2</key>
      <dict>
