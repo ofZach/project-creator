@@ -1,42 +1,20 @@
-
-
-
 #include "xcodeProjectFile.h"
-
-
 #include <iostream>
 
-//const char* node_types[] =
-//{
-//    "null", "document", "element", "pcdata", "cdata", "comment", "pi", "declaration"
-//};
-//
-////[code_traverse_walker_impl
-//struct simple_walker: pugi::xml_tree_walker
-//{
-//    virtual bool for_each(pugi::xml_node& node)
-//    {
-//        for (int i = 0; i < depth(); ++i) std::cout << "  "; // indentation
-//        
-//        std::cout << node_types[node.type()] << ": name='" << node.name() << "', value='" << node.value() << "'\n";
-//        
-//        return true; // continue traversal
-//    }
-//};
-////]
 
 
 
 
 void xcodeProjectFile::loadFile(string fileName){
+    
     pugi::xml_parse_result result = doc.load_file(ofToDataPath(fileName).c_str());
     // todo check result here
     bLoaded = true;
+    
+    // from this file, find the main.cpp, testApp.cpp and testApp.h in the XML
+    // and grab their info (we will use their nodes later when we add files)
     parseForSrc();
 }  
-
-
-
 
 
 void xcodeProjectFile::saveFile(string fileName){
@@ -44,10 +22,12 @@ void xcodeProjectFile::saveFile(string fileName){
 }  
 
 
+pugi::xml_node duplicateNodeBelow(pugi::xml_node & node ){
+    pugi::xml_node added = node.parent().insert_copy_after(node,node);
+    return added;
+}
 
-
-
-
+// scan the XML and find an array that contains this UUID.
 bool xcodeProjectFile::findArrayForUUID(string UUID, pugi::xml_node & nodeMe){
     char query[255];
     sprintf(query, "//string[contains(.,'%s')]", UUID.c_str());
@@ -81,17 +61,15 @@ void xcodeProjectFile::parseForSrc(){
             string UUID = string(node.node().parent().parent().previous_sibling().first_child().value());
             file.UUID = UUID;
             
-            
+            // 4 = file name 
             pugi::xpath_node_set set = node.node().parent().parent().select_nodes("string[4]");
             file.fileName = set.begin()->node().first_child().value();
-            //cout << UUID << " " << set.begin()->node().first_child().value() << endl;
             
+            // 5 = file path
             set = node.node().parent().parent().select_nodes("string[5]");
             file.filePath = set.begin()->node().first_child().value();
-            //cout << "path : " << " " << set.begin()->node().first_child().value() << endl;
-            
-            //file.nodeHash = node.node().parent().parent().hash_value();
-            //cout << "this nodes hash: " << node.node().parent().parent().hash_value() << endl; 
+           
+            // grab the parent node. 
             file.srcNode = node.node().parent().parent();
             srcFiles.push_back(file);
             
@@ -99,7 +77,9 @@ void xcodeProjectFile::parseForSrc(){
     }
     
     for (int i = 0; i < srcFiles.size(); i++){
-        // one is an "array", the second 
+        
+        //find the strings that contains this UUID.
+        // one is an "array", the second, if it exists, is the buildRef 
         
         char query[255];
         sprintf(query,"//string[contains(.,'%s')]",  srcFiles[i].UUID.c_str());
@@ -110,31 +90,19 @@ void xcodeProjectFile::parseForSrc(){
             if (strcmp(node.node().parent().name(), "array") == 0){
                 srcFiles[i].srcArrayNode = node.node().parent();
             } else {
-                // this is the "buildRef"
-                //cout <<  node.node().parent().name() <<endl;
-                //cout << string(node.node().parent().previous_sibling().first_child().value()) << endl;
-                string buildRefUUID = string(node.node().parent().previous_sibling().first_child().value());
                 
+                string buildRefUUID = string(node.node().parent().previous_sibling().first_child().value());
                 srcFiles[i].buildRefUUID = buildRefUUID;
                 srcFiles[i].buildRefNode = node.node().parent();
-                
                 pugi::xml_node buildRefArray;
                 findArrayForUUID(buildRefUUID, buildRefArray);
-                //simple_walker walker;
-                //cout << buildRefArray.name() << endl;
-                //buildRefArray.traverse(walker);
-                //buildRefArray.print(std::cout);
-                
                 srcFiles[i].buildRefArrayNode = buildRefArray;
-                // this array is what gets built.
-                // let's get the array associated with this build ref UUID
-                
             }
         }
     }
     
     /*
-    // now, let's output everything!
+    // now, let's output everything, to make sure it's all good. 
     for (int i = 0; i < srcFiles.size(); i++){
         printf("----------------------------------------- \n");
         cout << srcFiles[i].fileName << " " << srcFiles[i].filePath << endl;
@@ -154,8 +122,19 @@ void xcodeProjectFile::parseForSrc(){
 
 }
 
+
+// this is all UUID related: 
+// generate new UUIDS for each file that are random enough. 
+
+int unixTimeAtLaunch;
+xcodeProjectFile::xcodeProjectFile(){
+    unixTimeAtLaunch = ofGetUnixTime();
+}
+
+int counter = 0;
 string generateUUID(){
-    ofSeedRandom(ofGetUnixTime());
+    ofSeedRandom( unixTimeAtLaunch + counter++);
+    
     char UPPER_DIGITS[16] = {
         '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
         'A', 'B', 'C', 'D', 'E', 'F',
@@ -172,15 +151,18 @@ string generateUUID(){
 void xcodeProjectFile::addSrc(string srcFile){
     
     
-   
+    // todo, there's some duplicate code here...
+    
+    
     if (ofIsStringInString(srcFile, ".h") || 
         ofIsStringInString(srcFile, ".hpp")  ){
         
-        // assume that the 3rd item in the src files is "testApp.h" -- this might not be the case
+        // assume that the 3rd item in the src files is "testApp.h":
         xcodeSrcFile testAppH = srcFiles[2];
-        
         string UUID = generateUUID();
-    
+        //printf("addind src %s, UUID %s \n", srcFile.c_str(), UUID.c_str());
+        
+        // from the srcFile, get a path and fileName out of it.  (path here includes fileName)
         string srcFolder, srcName;
         if (ofIsStringInString(srcFile, "/")){
             size_t found = srcFile.find_last_of("/");
@@ -191,8 +173,10 @@ void xcodeProjectFile::addSrc(string srcFile){
             srcName      = srcFile;
         }
         
+        
         // add a node with this info
-        pugi::xml_node added = testAppH.srcNode.parent().insert_copy_after(testAppH.srcNode,testAppH.srcNode);
+        // string[4] = fileName, string[5] = filePath
+        pugi::xml_node added = duplicateNodeBelow(testAppH.srcNode);
         pugi::xpath_node_set set = added.select_nodes("string[4]");
         set.begin()->node().first_child().set_value(srcName.c_str());
         set = added.select_nodes("string[5]");
@@ -204,67 +188,58 @@ void xcodeProjectFile::addSrc(string srcFile){
         addedKey.first_child().set_value(UUID.c_str());
         
         // add it to the SOURCE array: 
-        
+        pugi::xml_node arrayAdd = testAppH.srcArrayNode.append_child("string");
+        arrayAdd.append_child(pugi::node_pcdata).set_value(UUID.c_str());
         
     } else {
         
+        // assume that the 1st item in the src files is "main.cpp" -- this might not be the case
+        xcodeSrcFile testAppC = srcFiles[0];
+        string UUID = generateUUID();
+        //printf("addind src %s, UUID %s \n", srcFile.c_str(), UUID.c_str());
+        
+        string srcFolder, srcName;
+        if (ofIsStringInString(srcFile, "/")){
+            size_t found = srcFile.find_last_of("/");
+            srcFolder    = srcFile; //srcFile.substr(0,found);
+            srcName      = srcFile.substr(found+1);
+        } else {
+            srcFolder    = srcFile;
+            srcName      = srcFile;
+        }
+        
+        // add a node with this info
+        pugi::xml_node added = duplicateNodeBelow(testAppC.srcNode);
+        pugi::xpath_node_set set = added.select_nodes("string[4]");
+        added.select_nodes("string[4]").begin()->node().first_child().set_value(srcName.c_str());
+        added.select_nodes("string[5]").begin()->node().first_child().set_value(srcFolder.c_str());
+        
+        // add a key with a generated UUID
+        pugi::xml_node key = testAppC.srcNode.previous_sibling();
+        pugi::xml_node addedKey = testAppC.srcNode.parent().insert_copy_before(key,added);
+        addedKey.first_child().set_value(UUID.c_str());
+        
+        // get this UUID into source array
+        pugi::xml_node arrayAdd = testAppC.srcArrayNode.append_child("string");
+        arrayAdd.append_child(pugi::node_pcdata).set_value(UUID.c_str());
+        
+        // copy the build ref node:
+        string buildUUID = generateUUID();
+        //printf("addind src %s, buildUUID %s \n", srcFile.c_str(), buildUUID.c_str());
+        
+        pugi::xml_node buildRefAdded = duplicateNodeBelow(testAppC.buildRefNode);
+        //buildRefAdded.print(std::cout);
+        buildRefAdded.select_nodes("string[1]").begin()->node().first_child().set_value(UUID.c_str());
+        key = testAppC.buildRefNode.previous_sibling();
+        addedKey = testAppC.buildRefNode.parent().insert_copy_before(key,buildRefAdded);
+        addedKey.first_child().set_value(buildUUID.c_str());
+        
+        // now get this build ref in the build array
+        pugi::xml_node buildArrayAdd = testAppC.buildRefArrayNode.append_child("string");
+        buildArrayAdd.append_child(pugi::node_pcdata).set_value(buildUUID.c_str());
+        
+        
     }
-    
-    // so we want to throw into the array, 
-    // and duplicate this fileRef
-    // the fileRef also gets added to a build step if this is a .cpp file. 
-    
-     /*
-     // source files appear here: 
-     <key>E4B69E1C0A3A1BDC003C02F2</key>
-     <dict>
-     <key>children</key>
-     <array>
-     <string>E4B69E1D0A3A1BDC003C02F2</string>
-     <string>E4B69E1E0A3A1BDC003C02F2</string>
-     <string>E4B69E1F0A3A1BDC003C02F2</string>
-     </array>
-     <key>isa</key>
-     <string>PBXGroup</string>
-     <key>path</key>
-     <string>src</string>
-     <key>sourceTree</key>
-     <string>SOURCE_ROOT</string>
-     </dict>
-     
-     and here: 
-     
-     
-     <key>E4B69E200A3A1BDC003C02F2</key>
-     <dict>
-     <key>fileRef</key>
-     <string>E4B69E1D0A3A1BDC003C02F2</string>
-     <key>isa</key>
-     <string>PBXBuildFile</string>
-     </dict>
-     
-     if they are compiled
-     
-     compile options appear here:
-     
-     <key>E4B69B580A3A1756003C02F2</key>
-     <dict>
-     <key>buildActionMask</key>
-     <string>2147483647</string>
-     <key>files</key>
-     <array>
-     <string>E4B69E200A3A1BDC003C02F2</string>
-     <string>E4B69E210A3A1BDC003C02F2</string>
-     </array>
-     <key>isa</key>
-     <string>PBXSourcesBuildPhase</string>
-     <key>runOnlyForDeploymentPostprocessing</key>
-     <string>0</string>
-     </dict>
-     
-     craziness...
-     */
-    
 } 
 
 void xcodeProjectFile::addInclude(string includeName){

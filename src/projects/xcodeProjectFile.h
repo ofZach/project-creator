@@ -34,6 +34,8 @@ class xcodeProjectFile : public baseProjectFile {
     
 public: 
     
+    xcodeProjectFile();
+    
     void loadFile(string fileName);
     void saveFile(string fileName);
     void addSrc(string srcFile);
@@ -51,51 +53,6 @@ public:
 
 //http://pocoproject.org/docs/Poco.UUIDGenerator.html
 
-//"xcode/emptyExample.xcodeproj/project.pbxproj"
-
-// to add an object (src)
-
-// first add it here: 
-// /plist[1]/dict[1]/dict[2]
-
-/*
- <key>117A509E14AA1DEC001889C6</key>  << ----- UUID
- <dict>
- <key>fileEncoding</key>
- <string>4</string>
- <key>isa</key>
- <string>PBXFileReference</string>
- <key>lastKnownFileType</key>
- <string>sourcecode.c.h</string>
- <key>path</key>
- <string>blah.h</string>
- <key>sourceTree</key>
- <string>&lt;group&gt;</string>
- </dict>
- */
-
-// then here:
-
-/*
- 
- <dict>
- <key>children</key>
- <array>
- <string>E4B6FCAD0C3E899E008CF71C</string>
- <string>E4EB6923138AFD0F00A09F29</string>
- <string>E4B69E1C0A3A1BDC003C02F2</string>
- <string>E4EEC9E9138DF44700A80321</string>
- <string>BB4B014C10F69532006C3DED</string>
- <string>E45BE5980E8CC70C009D7055</string>
- <string>E4B69B5B0A3A1756003C02F2</string>
- </array>
- <key>isa</key>
- <string>PBXGroup</string>
- <key>sourceTree</key>
- <string>&lt;group&gt;</string>
- </dict>
-
- */
 
 // search paths: 
 
