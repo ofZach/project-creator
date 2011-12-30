@@ -225,7 +225,6 @@ void xcodeProjectFile::addSrc(string srcFile){
         
         // copy the build ref node:
         string buildUUID = generateUUID();
-        //printf("addind src %s, buildUUID %s \n", srcFile.c_str(), buildUUID.c_str());
         
         pugi::xml_node buildRefAdded = duplicateNodeBelow(testAppC.buildRefNode);
         //buildRefAdded.print(std::cout);
