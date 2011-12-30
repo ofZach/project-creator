@@ -1,14 +1,10 @@
 #pragma once
 
 #include "ofMain.h"
-
-#include "addonsParser.h"
-#include "codeblocksProjectFile.h"
-#include "visualStudioProjectFile.h"
-#include "xcodeProjectFile.h"
-
-
-
+#include "CBLinuxProject.h"
+#include "CBWinProject.h"
+#include "visualStudioProject.h"
+#include "xcodeProject.h"
 
 class testApp : public ofBaseApp{
 
@@ -26,13 +22,9 @@ class testApp : public ofBaseApp{
 		void windowResized(int w, int h);
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
-    
-        addonsParser AP;
-    
-        codeblocksProjectFile CBP;
-        visualStudioProjectFile VSP;
-        xcodeProjectFile XCP;
-    
 		
+		CBLinuxProject linuxProject;
+		CBWinProject winProject;
+		visualStudioProject vsProject;
+		xcodeProject xcProject;
 };
-

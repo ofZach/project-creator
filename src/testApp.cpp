@@ -1,56 +1,31 @@
 #include "testApp.h"
-#include "pugixml.hpp"
-
-
+#include "Utils.h"
 
 //--------------------------------------------------------------
 void testApp::setup(){
+	
+    
+    /*setOFRoot("/home/arturo/Escritorio/openFrameworks");
 
-    
-    //AP.loadAddons();
-    
-    /*
-    CBP.loadFile("codeblocks_windows/emptyExample.cbp");
-    
-    CBP.addSrc( "src/testApp.cpp");
-    CBP.addSrc( "src/testApp23.cpp");
-    CBP.addSrc( "src/testApp232342.cpp");
-    CBP.addInclude( "../../../sdfasdf.h");
-    CBP.addLibrary( "../../../sdfasdf.lib");
-    
-    CBP.saveFile("codeblocks_windows/emptyExample2.cbp");
-    
-    
-    printf("------ \n");
-    VSP.loadFile("visualstudio_windows/emptyExample.vcxproj");
-    VSP.addInclude("test");
-    VSP.addLibrary("../../../addons/opencv/opencv.a");
-    VSP.addSrc("src/testApp.h");
-    VSP.addSrc("src/blah.h");
-    VSP.addSrc("src/blah.cpp");
-    VSP.saveFile("visualstudio_windows/emptyExample2.vcxproj");
-    
-    */
-    XCP.loadFile("xcode/emptyExample.xcodeproj/project.pbxproj");
-    XCP.addSrc("src/blah.h");
-    XCP.addSrc("src/blah.cpp");
-     XCP.saveFile("xcode/emptyExample.xcodeproj/project2.pbxproj");
-    
-//    
-//    addSrc(doc, "src/testApp.cpp");
-//    addSrc(doc, "testApp3.cpp");
-//    addSrc(doc, "testApp4.cpp");
-//    addInclude(doc, "../../../addons/test.cpp");
-//    addInclude(doc, "../../../addons/test.h");
-//    addLibrary(doc, "../../../addons/blah.lib");
-//    
-//    
-//    
-//    
-//    
-//    
-//    
-//    doc.save_file(ofToDataPath("codeblocks_windows/test.cbp").c_str());
+	ofSetLogLevel(CBLinuxProject::LOG_NAME,OF_LOG_VERBOSE);
+	linuxProject.create(getOFRoot()+"/apps/testApp/testCreatorLinux");
+	ofAddon addon(getOFRoot()+"/addons/ofxOpenCv","linux");
+	linuxProject.addAddon(addon);
+
+	winProject.create(getOFRoot()+"/apps/testApp/testCreatorWin");
+	addon.fromFS(getOFRoot()+"/addons/ofxOpenCv","win_cb");
+	winProject.addAddon(addon);
+
+	vsProject.create(getOFRoot()+"/apps/testApp/testCreatorVS");
+	addon.fromFS(getOFRoot()+"/addons/ofxOpenCv","vs2010");
+	vsProject.addAddon(addon);
+	vsProject.save(getOFRoot()+"/apps/testApp/testCreatorVS/testCreatorVS.vcxproj");
+     */
+	xcProject.load("xcode/emptyExample.xcodeproj/project.pbxproj");
+	xcProject.addSrc("src/newFile.h","src");
+    xcProject.addSrc("src/newFile.cpp","src");
+	xcProject.save("xcode/emptyExample.xcodeproj/project2.pbxproj");
+
 }
 
 
