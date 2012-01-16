@@ -16,6 +16,8 @@
 string getOFRoot();
 void setOFRoot(string path);
 
+void findandreplace( std::string& tInput, std::string tFind, std::string tReplace );
+
 bool doesTagAndAttributeExist(pugi::xml_document & doc, string tag, string attribute, string newValue);
 pugi::xml_node appendValue(pugi::xml_document & doc, string tag, string attribute, string newValue);
 

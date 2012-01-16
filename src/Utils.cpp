@@ -17,7 +17,21 @@ using namespace Poco;
 #include "ofUtils.h"
 
 
-
+void findandreplace( std::string& tInput, std::string tFind, std::string tReplace ) { 
+	size_t uPos = 0; 
+	size_t uFindLen = tFind.length(); 
+	size_t uReplaceLen = tReplace.length();
+    
+	if( uFindLen == 0 ){
+		return;
+	}
+    
+	for( ;(uPos = tInput.find( tFind, uPos )) != std::string::npos; ){
+		tInput.replace( uPos, uFindLen, tReplace );
+		uPos += uReplaceLen;
+	}	
+    
+}
 
 
 bool doesTagAndAttributeExist(pugi::xml_document & doc, string tag, string attribute, string newValue){

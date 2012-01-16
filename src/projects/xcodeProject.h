@@ -5,36 +5,13 @@
 #include "baseProject.h"
 
 
-class xcodeSrcFile {
-    
-    
-public: 
-    xcodeSrcFile(){
-    };
-    ~xcodeSrcFile(){};
-    string UUID;
-    string fileName;
-    string filePath;
-    
-    string buildRefUUID;
-    
-    // I appear a few places. 
-    
-    pugi::xml_node srcNode;
-    pugi::xml_node srcArrayNode;
-    pugi::xml_node buildRefNode;
-    pugi::xml_node buildRefArrayNode;
-    
-    
-    
-} ;
-
 
 class xcodeProject : public baseProject {
     
 public: 
     
-    xcodeProject();
+    xcodeProject(){};
+    
     bool load(string path);
     bool create(string path){}; // not done yet. 
 	bool save(string path);
@@ -45,13 +22,20 @@ public:
 
 	void addAddon(ofAddon & addon);
 
+
+    
+    pugi::xml_node findOrMakeFolderSet( vector < string > folders );
+    
+    
+    
 	string getName();
 	string getPath();
 
-    // adding src is hard, here's some help
-    vector < xcodeSrcFile > srcFiles;
-    void parseForSrc();
-    bool findArrayForUUID(string UUID, pugi::xml_node & nodeMe);
+    
+    pugi::xml_node insertPoint;         // where are we inserting items (at the second dict tag,
+                                        // /plist[1]/dict[1]/dict[2])
+    
+   bool findArrayForUUID(string UUID, pugi::xml_node & nodeMe);
     
 };
 
