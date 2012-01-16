@@ -9,6 +9,43 @@
 		<string>42</string>
 		<key>objects</key>
 		<dict>
+			<key>70f1d6d8ccd0d4a18886c0083897d044</key>
+			<dict>
+				<key>fileRef</key>
+				<string>dde48cdb8874f37d04827778c84ca458</string>
+				<key>isa</key>
+				<string>PBXBuildFile</string>
+			</dict>
+			<key>dde48cdb8874f37d04827778c84ca458</key>
+			<dict>
+				<key>explicitFileType</key>
+				<string>sourcecode.cpp.cpp</string>
+				<key>fileEncoding</key>
+				<string>30</string>
+				<key>isa</key>
+				<string>PBXFileReference</string>
+				<key>name</key>
+				<string>src/newFile.cpp</string>
+				<key>path</key>
+				<string>src/src/newFile.cpp</string>
+				<key>sourceTree</key>
+				<string>SOURCE_ROOT</string>
+			</dict>
+			<key>f803d251c02a3bc294a29a60f11f47e4</key>
+			<dict>
+				<key>explicitFileType</key>
+				<string>sourcecode.c.h</string>
+				<key>fileEncoding</key>
+				<string>30</string>
+				<key>isa</key>
+				<string>PBXFileReference</string>
+				<key>name</key>
+				<string>src/newFile.h</string>
+				<key>path</key>
+				<string>src/src/newFile.h</string>
+				<key>sourceTree</key>
+				<string>SOURCE_ROOT</string>
+			</dict>
 			<key>BB4B014C10F69532006C3DED</key>
 			<dict>
 				<key>children</key>
@@ -123,7 +160,7 @@
 				<key>isa</key>
 				<string>PBXReferenceProxy</string>
 				<key>path</key>
-				<string>openFrameworks.a</string>
+				<string>openFrameworksDebug.a</string>
 				<key>remoteRef</key>
 				<string>E4328147138ABC890047C5CB</string>
 				<key>sourceTree</key>
@@ -440,10 +477,24 @@
 					<string>NO</string>
 					<key>GCC_WARN_UNUSED_VARIABLE</key>
 					<string>NO</string>
+					<key>HEADER_SEARCH_PATHS</key>
+					<array>
+						<string>../../../includeTest.h</string>
+						<string>$(OF_CORE_HEADERS)</string>
+						<string>../../../libs/blah</string>
+					</array>
+					<key>LIBRARY_SEARCH_PATHS</key>
+					<string>../../../librarySearchPath</string>
 					<key>OTHER_CPLUSPLUSFLAGS</key>
 					<array>
 						<string>-D__MACOSX_CORE__</string>
 						<string>-lpthread</string>
+					</array>
+					<key>OTHER_LDFLAGS</key>
+					<array>
+						<string>testLib.a</string>
+						<string>$(OF_CORE_LIBS)</string>
+						<string>../../../libs/blahLib.a</string>
 					</array>
 				</dict>
 				<key>isa</key>
@@ -493,10 +544,24 @@
 					<string>NO</string>
 					<key>GCC_WARN_UNUSED_VARIABLE</key>
 					<string>NO</string>
+					<key>HEADER_SEARCH_PATHS</key>
+					<array>
+						<string>../../../includeTest.h</string>
+						<string>$(OF_CORE_HEADERS)</string>
+						<string>../../../libs/blah</string>
+					</array>
+					<key>LIBRARY_SEARCH_PATHS</key>
+					<string>../../../librarySearchPath</string>
 					<key>OTHER_CPLUSPLUSFLAGS</key>
 					<array>
 						<string>-D__MACOSX_CORE__</string>
 						<string>-lpthread</string>
+					</array>
+					<key>OTHER_LDFLAGS</key>
+					<array>
+						<string>testLib.a</string>
+						<string>$(OF_CORE_LIBS)</string>
+						<string>../../../libs/blahLib.a</string>
 					</array>
 				</dict>
 				<key>isa</key>
@@ -512,7 +577,7 @@
 				<array>
 					<string>E4B69E200A3A1BDC003C02F2</string>
 					<string>E4B69E210A3A1BDC003C02F2</string>
-					<string>DF3A910DD15351E79AB3F7CC</string>
+					<string>70f1d6d8ccd0d4a18886c0083897d044</string>
 				</array>
 				<key>isa</key>
 				<string>PBXSourcesBuildPhase</string>
@@ -565,7 +630,7 @@
 				<key>isa</key>
 				<string>PBXNativeTarget</string>
 				<key>name</key>
-				<string>emptyExample</string>
+				<string>graphicsExample</string>
 				<key>productName</key>
 				<string>myOFApp</string>
 				<key>productReference</key>
@@ -582,7 +647,7 @@
 				<key>isa</key>
 				<string>PBXFileReference</string>
 				<key>path</key>
-				<string>emptyExampleDebug.app</string>
+				<string>graphicsExampleDebug.app</string>
 				<key>sourceTree</key>
 				<string>BUILT_PRODUCTS_DIR</string>
 			</dict>
@@ -817,8 +882,6 @@
 					<string>E4B69E1D0A3A1BDC003C02F2</string>
 					<string>E4B69E1E0A3A1BDC003C02F2</string>
 					<string>E4B69E1F0A3A1BDC003C02F2</string>
-					<string>0B90823E5FCBAFD2EF2788F2</string>
-					<string>FDE61A16908F075D35ED485F</string>
 				</array>
 				<key>isa</key>
 				<string>PBXGroup</string>
@@ -839,21 +902,6 @@
 				<string>main.cpp</string>
 				<key>path</key>
 				<string>src/main.cpp</string>
-				<key>sourceTree</key>
-				<string>SOURCE_ROOT</string>
-			</dict>
-			<key>FDE61A16908F075D35ED485F</key>
-			<dict>
-				<key>fileEncoding</key>
-				<string>30</string>
-				<key>isa</key>
-				<string>PBXFileReference</string>
-				<key>lastKnownFileType</key>
-				<string>sourcecode.cpp.cpp</string>
-				<key>name</key>
-				<string>newFile.cpp</string>
-				<key>path</key>
-				<string>src/newFile.cpp</string>
 				<key>sourceTree</key>
 				<string>SOURCE_ROOT</string>
 			</dict>
@@ -887,32 +935,10 @@
 				<key>sourceTree</key>
 				<string>SOURCE_ROOT</string>
 			</dict>
-			<key>0B90823E5FCBAFD2EF2788F2</key>
-			<dict>
-				<key>fileEncoding</key>
-				<string>30</string>
-				<key>isa</key>
-				<string>PBXFileReference</string>
-				<key>lastKnownFileType</key>
-				<string>sourcecode.c.h</string>
-				<key>name</key>
-				<string>newFile.h</string>
-				<key>path</key>
-				<string>src/newFile.h</string>
-				<key>sourceTree</key>
-				<string>SOURCE_ROOT</string>
-			</dict>
 			<key>E4B69E200A3A1BDC003C02F2</key>
 			<dict>
 				<key>fileRef</key>
 				<string>E4B69E1D0A3A1BDC003C02F2</string>
-				<key>isa</key>
-				<string>PBXBuildFile</string>
-			</dict>
-			<key>DF3A910DD15351E79AB3F7CC</key>
-			<dict>
-				<key>fileRef</key>
-				<string>FDE61A16908F075D35ED485F</string>
 				<key>isa</key>
 				<string>PBXBuildFile</string>
 			</dict>
