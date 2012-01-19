@@ -21,8 +21,10 @@ void testApp::setup(){
 	vsProject.addAddon(addon);
 	vsProject.save(getOFRoot()+"/apps/testApp/testCreatorVS/testCreatorVS.vcxproj");
      */
-	xcProject.load("xcode/emptyExample.xcodeproj/project_gotLinks.pbxproj");
-	xcProject.addSrc("src/newFile.h","src");
+	//xcProject.load("xcode/emptyExample.xcodeproj/project_gotLinks.pbxproj");
+	xcProject.load("xcode/emptyExample.xcodeproj/project.pbxproj");
+	
+    xcProject.addSrc("src/newFile.h","src");
     xcProject.addSrc("src/newFile.cpp","src");
     
     

@@ -36,76 +36,6 @@ descr.append_child(pugi::node_pcdata).set_value("Simple node");
 //  string[contains(.,'&lt;group')]/parent::node()//string[contains(.,'PBXGroup')]/parent::node()//key[contains(.,'name')]/following-sibling::node()[1]
 
 
-
-
-// notes for include / linking
-// it's in the dict here. (there are 2, release and debug) 
-
-//  <dict>
-//  <key>baseConfigurationReference</key>
-
-
-// XPATH:   //key[contains(.,'baseConfigurationReference')]/parent::node()
-
-
-// it would look like: 
-
-//    <key>HEADER_SEARCH_PATHS</key>
-//    <array>
-//    <string>../../../includeTest.h</string>
-//    <string>$(OF_CORE_HEADERS)</string>
-//    </array>
-
-//    <key>LIBRARY_SEARCH_PATHS</key>
-//    <array>
-//    <string>../../../librarySearchPath</string>
-//    </array>
-
-//    <key>OTHER_CPLUSPLUSFLAGS</key>
-//    <array>
-//    <string>-D__MACOSX_CORE__</string>
-//    <string>-lpthread</string>
-//    </array>
-
-//    <key>OTHER_LDFLAGS</key>
-//    <array>
-//    <string>testLib.a</string>
-//    <string>$(OF_CORE_LIBS)</string>
-//    </array>
-
-// we need to add
-
-// HEADER_SEARCH_PATHS
-// LIBRARY_SEARCH_PATHS
-// OTHER_LDFLAGS
-
-// if they don't exist, 
-// because with the config files, this stuff is kind of missing. 
-// I would guess anywhere in that dict is ok, order seems not to matter. 
-
-// check if they exist: 
-//key[contains(.,'baseConfigurationReference')]/parent::node()//key[contains(.,'HEADER_SEARCH_PATHS')]
-//if they exist, get the array
-//key[contains(.,'baseConfigurationReference')]/parent::node()//key[contains(.,'HEADER_SEARCH_PATHS')]//array
-
-
-//if it exists, it looks like this to get to the array: 
-
-//key[contains(.,'baseConfigurationReference')]/parent::node()//key[contains(.,'OTHER_CPLUSPLUSFLAGS')]/following-sibling::node()
-
-//          returns
-
-//        <array>
-//        <string>-D__MACOSX_CORE__</string>
-//        <string>-lpthread</string>
-//        </array>
-//        <array>
-//        <string>-D__MACOSX_CORE__</string>
-//        <string>-lpthread</string>
-//        </array>
-
-
-
 const char PBXGroup[] = 
 STRINGIFY(
 
@@ -158,9 +88,26 @@ STRINGIFY(
           
 );
 
+const char HeaderSearchPath[] = 
+STRINGIFY(
+          
+    <key>HEADER_SEARCH_PATHS</key>
+    <array>
+    <string>$(OF_CORE_HEADERS)</string>
+    </array>
+
+);
 
 
-
+const char LDFlags[] = 
+STRINGIFY(
+          
+          <key>OTHER_LDFLAGS</key>
+          <array>
+          <string>$(OF_CORE_LIBS)</string>
+          </array>
+          
+);
 
 
 bool xcodeProject::load(string path){
@@ -409,15 +356,28 @@ void xcodeProject::addInclude(string includeName){
         
     } else {
         
+        printf("we don't have HEADER_SEARCH_PATHS, so we're adding them... and calling this function again \n");
         query[255];
-        sprintf(query, "key[contains(.,'baseConfigurationReference')]/parent::node()");
+        sprintf(query, "//key[contains(.,'baseConfigurationReference')]/parent::node()//key[contains(.,'buildSettings')]/following-sibling::node()[1]");
         pugi::xpath_node_set dictArray = doc.select_nodes(query);
+        
+        
         for (pugi::xpath_node_set::const_iterator it = dictArray.begin(); it != dictArray.end(); ++it){
             pugi::xpath_node node = *it;
             
-            // todo: this needs to get done
-            //node.node().append_child("string").append_child(pugi::node_pcdata).set_value(includeName.c_str());
+            node.node().print(std::cout);
+            string headerXML = string(HeaderSearchPath);
+            pugi::xml_document headerDoc;
+            pugi::xml_parse_result result = headerDoc.load_buffer(headerXML.c_str(), strlen(headerXML.c_str()));
+            
+            // insert it at <plist><dict><dict>
+            node.node().prepend_copy(headerDoc.first_child().next_sibling());   // KEY FIRST
+            node.node().prepend_copy(headerDoc.first_child());                  // ARRAY SECOND
+            
         }
+        
+        // now that we have it, try again...
+        addInclude(includeName);
     }
 
 }  
@@ -445,15 +405,29 @@ void xcodeProject::addLibrary(string libraryName){
         
     } else {
         
+        printf("we don't have OTHER_LDFLAGS, so we're adding them... and calling this function again \n");
         query[255];
-        sprintf(query, "key[contains(.,'baseConfigurationReference')]/parent::node()");
+        sprintf(query, "//key[contains(.,'baseConfigurationReference')]/parent::node()//key[contains(.,'buildSettings')]/following-sibling::node()[1]");
+        
         pugi::xpath_node_set dictArray = doc.select_nodes(query);
+        
+        
         for (pugi::xpath_node_set::const_iterator it = dictArray.begin(); it != dictArray.end(); ++it){
             pugi::xpath_node node = *it;
             
-            // todo: this needs to get done
-            //node.node().append_child("string").append_child(pugi::node_pcdata).set_value(includeName.c_str());
+            node.node().print(std::cout);
+            string ldXML = string(LDFlags);
+            pugi::xml_document ldDoc;
+            pugi::xml_parse_result result = ldDoc.load_buffer(ldXML.c_str(), strlen(ldXML.c_str()));
+            
+            // insert it at <plist><dict><dict>
+            node.node().prepend_copy(ldDoc.first_child().next_sibling());   // KEY FIRST
+            node.node().prepend_copy(ldDoc.first_child());                  // ARRAY SECOND
+            
         }
+        
+        // now that we have it, try again...
+        addLibrary(libraryName);
     }
     
 }
