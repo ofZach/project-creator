@@ -78,6 +78,12 @@ void getFilesRecursively(const string & path, vector < string > & fileNames){
 
 }
 
+void splitFromLast(string toSplit, string deliminator, string & first, string & second){
+    size_t found = toSplit.find_last_of(deliminator.c_str());
+    first = toSplit.substr(0,found);
+    second = toSplit.substr(found+1);
+}
+
 
 void getLibsRecursively(const string & path, vector < string > & libFiles, vector < string > & libLibs, string platform ){
        DirectoryIterator end;

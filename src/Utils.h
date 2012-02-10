@@ -27,6 +27,11 @@ void getLibsRecursively(const string & path, vector < string > & libFiles, vecto
 
 
 
+void splitFromLast(string toSplit, string deliminator, string & first, string & second);
+
+
+
+
 void fixSlashOrder(string & toFix);
 string unsplitString (vector < string > strings, string deliminator );
 

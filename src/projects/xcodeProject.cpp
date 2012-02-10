@@ -9,33 +9,11 @@ using Poco::DigestEngine;
 using Poco::HMACEngine;
 using Poco::MD5Engine;
 
-
 #define STRINGIFY(A)  #A
 
 
-    #define STRINGIFY(A)  #A
 
-    const char shader[] = 
-    STRINGIFY(
-
-    multiline code goes here
-
-    );
-
-
-/*
-//http://code.google.com/p/pugixml/source/browse/trunk/docs/samples/modify_add.cpp
-// this is how to add a tag with a value. 
-pugi::xml_node descr = node.append_child("description");
-descr.append_child(pugi::node_pcdata).set_value("Simple node");
- */
-
-
-//  this gets the names of all PBXGroup "group" tags....
-//  not the ideal way to deal with folder tho. 
-//  string[contains(.,'&lt;group')]/parent::node()//string[contains(.,'PBXGroup')]/parent::node()//key[contains(.,'name')]/following-sibling::node()[1]
-
-
+//-----------------------------------------------------------------
 const char PBXGroup[] = 
 STRINGIFY(
 
@@ -46,14 +24,15 @@ STRINGIFY(
         </array>
         <key>isa</key>
         <string>PBXGroup</string>
-        <key>path</key>
-        <string>src</string>
+        <key>name</key>
+        <string>GROUPNAME</string>
         <key>sourceTree</key>
         <string>&lt;group&gt;</string>      // <group> or SOURCE_ROOT, etc
     </dict>
           
 );
 
+//-----------------------------------------------------------------
 const char PBXFileReference[] = 
 STRINGIFY(
 
@@ -75,6 +54,7 @@ STRINGIFY(
 
 );
 
+//-----------------------------------------------------------------
 const char PBXBuildFile[] = 
 STRINGIFY(
           
@@ -88,6 +68,7 @@ STRINGIFY(
           
 );
 
+//-----------------------------------------------------------------
 const char HeaderSearchPath[] = 
 STRINGIFY(
           
@@ -99,6 +80,7 @@ STRINGIFY(
 );
 
 
+//-----------------------------------------------------------------
 const char LDFlags[] = 
 STRINGIFY(
           
@@ -113,15 +95,7 @@ STRINGIFY(
 bool xcodeProject::load(string path){
     pugi::xml_parse_result result = doc.load_file(ofToDataPath(path).c_str());
     
-    // todo check result here
-    bLoaded = true;
-    
-    // from this file, find the main.cpp, testApp.cpp and testApp.h in the XML
-    // and grab their info (we will use their nodes later when we add files)
-    //parseForSrc();
-    
-    //makeGroupNode("blah", "blasdhsadf");
-    //std::exit(0);
+    //bLoaded = true;
     
 	return result.status==pugi::status_ok;
 }  
@@ -147,76 +121,125 @@ bool xcodeProject::findArrayForUUID(string UUID, pugi::xml_node & nodeMe){
     return false;
 }
 
-//void recurivePathSearch(path * pathToSearch, string name)
-
-
-pugi::xml_node findOrMakeFolderSet(vector < string > folders){
-    
-    pugi::xml_node folderSet;
-    if (folders.size() == 0) return folderSet;
-    
-    if (folders[0] == "src"){
-        //key[contains(.,"E4B69E1C0A3A1BDC003C02F2")]/following-sibling::node()[1]//array/string/text()
-    } else if (folders[0] == "addons"){
-        //key[contains(.,"BB4B014C10F69532006C3DED")]/following-sibling::node()[1]//array/string/text()
-    } else {
-        // I'm not sure the best way to proceed;
-    
-    }
-    
-}
-
-
-//  this is for SRC
-//  key[contains(.,"E4B69E1C0A3A1BDC003C02F2")]/following-sibling::node()[1]
-//  this is for addons
-//  key[contains(.,"BB4B014C10F69532006C3DED")]/following-sibling::node()[1]
-
-//  key[contains(.,"E4B69E1C0A3A1BDC003C02F2")]/following-sibling::node()[1]//array/string/text()
-//  E4B69E1F0A3A1BDC003C02F2
-// 
-//  gets you all keys for pbxgroups
-//  string[contains(.,'PBXGroup')]/parent::node()/preceding-sibling::node()[1]
-//  checks, does a group exist, for this key?
-//  string[contains(.,'PBXGroup')]/parent::node()/preceding-sibling::node()[1][contains(.,'BB4B014C10F69532006C3DED')]
-
-
-// does group exist
-// add group to group
-// add fileToGroup
-
-
-//bool xcodeProject::bDoesFileExist(string fileName, string fileType){
-//    
-//    // grab all the strings
-//    pugi::xpath_node_set source = doc.select_nodes("//string/text()");
-//    
-//    // if it equals something like "sourcecode.cpp.cpp" check the file name
-//    for (pugi::xpath_node_set::const_iterator it = source.begin(); it != source.end(); ++it){
-//        pugi::xpath_node node = *it;
-//        if (strcmp(node.node().value(), fileType.c_str()) == 0){
-//            pugi::xpath_node_set set = node.node().parent().parent().select_nodes("string[4]");
-//            set.begin()->node().first_child().value();
-//        }
-//    }
-//    return false;
-//}
 
 
 string generateUUID(string input){
     
     std::string passphrase("openFrameworks"); // HMAC needs a passphrase
-
+    
     HMACEngine<MD5Engine> hmac(passphrase); // we'll compute a MD5 Hash
     hmac.update(input);
-
+    
     const DigestEngine::Digest& digest = hmac.digest(); // finish HMAC computation and obtain digest
     std::string digestString(DigestEngine::digestToHex(digest)); // convert to a string of hexadecimal numbers
-
+    
     return digestString;	
+    
+    
+}
 
+
+
+
+
+pugi::xml_node xcodeProject::findOrMakeFolderSet(pugi::xml_node nodeToAddTo, vector < string > folders, string pathForHash){
+    
+    
+    
+    
+    char query[255];
+    sprintf(query, "//key[contains(.,'%s')]/following-sibling::node()[1]//array/string", nodeToAddTo.previous_sibling().first_child().value());
+    pugi::xpath_node_set array = doc.select_nodes(query);
+    
+    bool bAnyNodeWithThisName = false;
+    pugi::xml_node nodeWithThisName;
+    string name = folders[0];
+    
+    cout << "trying to find name " << name << endl;
+    
+    for (pugi::xpath_node_set::const_iterator it = array.begin(); it != array.end(); ++it){
+        
+        pugi::xpath_node node = *it;
+        //node.node().first_child().print(std::cout);
+        
+        // this long thing checks, is this a pbxgroup, and if so, what's it's name. 
+        // do it once for path and once for name, since ROOT level pbxgroups have a path name. ugh. 
+        
+        char querypbx[255];
+        sprintf(querypbx, "//key[contains(.,'%s')]/following-sibling::node()[1]//string[contains(.,'PBXGroup')]/parent::node()[1]//key[contains(.,'path')]/following-sibling::node()[1]", node.node().first_child().value());
+        if (doc.select_single_node(querypbx).node() != NULL){
+            
+            if (strcmp(doc.select_single_node(querypbx).node().first_child().value(), folders[0].c_str()) == 0){
+                
+                bAnyNodeWithThisName = true;
+                nodeWithThisName = doc.select_single_node(querypbx).node().parent();
+            }
+        }
+        
+        sprintf(querypbx, "//key[contains(.,'%s')]/following-sibling::node()[1]//string[contains(.,'PBXGroup')]/parent::node()[1]//key[contains(.,'name')]/following-sibling::node()[1]", node.node().first_child().value());
+        
+        if (doc.select_single_node(querypbx).node() != NULL){
+            if (strcmp(doc.select_single_node(querypbx).node().first_child().value(), folders[0].c_str()) == 0){
+                bAnyNodeWithThisName = true;
+                nodeWithThisName = doc.select_single_node(querypbx).node().parent();
+            }
+        }
+        
+    }
+    
+    cout << bAnyNodeWithThisName << endl;
+    
+
+    
+    // now, if we have a pbxgroup with the right name, pop this name off the folder set, and keep going. 
+    // else, let's add a folder set, boom. 
+    
+    if (bAnyNodeWithThisName == false){
+        
+        // make a new UUID 
+        // todo get the full path here somehow... 
+        
+        
+        string UUID = generateUUID(pathForHash);
+        
+        // add a new node
+        string PBXGroupStr = string(PBXGroup);
+        findandreplace( PBXGroupStr, "GROUPUUID", UUID);
+        findandreplace( PBXGroupStr, "GROUPNAME", folders[0]);
+        
+        pugi::xml_document pbxDoc;
+        pugi::xml_parse_result result = pbxDoc.load_buffer(PBXGroupStr.c_str(), strlen(PBXGroupStr.c_str()));
+        
+        
+        nodeWithThisName = doc.select_single_node("/plist[1]/dict[1]/dict[2]").node().prepend_copy(pbxDoc.first_child().next_sibling()); 
+        doc.select_single_node("/plist[1]/dict[1]/dict[2]").node().prepend_copy(pbxDoc.first_child()); 
+        
+        
+        printf(".......  ? \n");
+        nodeWithThisName.print(std::cout);
+        
+        // add to array
+        char queryArray[255];
+        sprintf(queryArray, "//key[contains(.,'%s')]/following-sibling::node()[1]//array", nodeToAddTo.previous_sibling().first_child().value());
+        doc.select_single_node(queryArray).node().append_child("string").append_child(pugi::node_pcdata).set_value(UUID.c_str());
+        //array.begin()->node().parent().append_child("string").append_child(pugi::node_pcdata).set_value(UUID.c_str());
+        
+        
+    }
+    
+    pathForHash += "/" + folders[0];
+    folders.erase(folders.begin());
+    
+    if (folders.size() > 0){ 
+        return findOrMakeFolderSet(nodeWithThisName, folders, pathForHash);
+    } else {
+        return nodeWithThisName;
+    }
 
 }
+
+
+
 
 
 
@@ -224,13 +247,18 @@ void xcodeProject::addSrc(string srcFile, string folder){
     
     
     
+    string buildUUID;
+    
+    //-----------------------------------------------------------------
     // find the extension for the file that's passed in. 
+    //-----------------------------------------------------------------
     
     size_t found = srcFile.find_last_of(".");
     string ext = srcFile.substr(found+1);
     
-    
+    //-----------------------------------------------------------------
     // based on the extension make some choices about what to do:
+    //-----------------------------------------------------------------
     
     bool addToResources = true;
     bool addToBuild = true;
@@ -267,8 +295,12 @@ void xcodeProject::addSrc(string srcFile, string folder){
     
     string pbxfileref = string(PBXFileReference);
     string UUID = generateUUID(srcFile);   // replace with theo's smarter system. 
-    findandreplace( pbxfileref, "FILENAME", srcFile);
-    findandreplace( pbxfileref, "FILEPATH", folder + "/" + srcFile);
+    
+    string name, path;
+    splitFromLast(srcFile, "/", path, name);
+    
+    findandreplace( pbxfileref, "FILENAME", name);
+    findandreplace( pbxfileref, "FILEPATH", srcFile);
     findandreplace( pbxfileref, "FILETYPE", fileKind);
     findandreplace( pbxfileref, "FILEUUID", UUID);
     
@@ -285,7 +317,7 @@ void xcodeProject::addSrc(string srcFile, string folder){
     
     if (addToBuild == true){
         
-        string buildUUID = generateUUID(srcFile + "-build");
+        buildUUID = generateUUID(srcFile + "-build");
         string pbxbuildfile = string(PBXBuildFile);
         findandreplace( pbxbuildfile, "FILEUUID", UUID);
         findandreplace( pbxbuildfile, "BUILDUUID", buildUUID);
@@ -313,24 +345,43 @@ void xcodeProject::addSrc(string srcFile, string folder){
     // (D) folder
     //-----------------------------------------------------------------
     
-    // now, do we need to add this to src, or somewhere else?
-    
+ 
     if (bAddFolder == true){
         
         vector < string > folders = ofSplitString(folder, "/");
         
-        int howManyLevelsDeep = folders.size();
-        int howManyLevelsExist = 0;
-        
-        //pugi::xml_node node = findOrMakeFolderSet( folders );
+        if (folders.size() > 1){
+            if (folders[0] == "src"){
+                
+                folders.erase(folders.begin());
+                pugi::xml_node node = doc.select_single_node("//key[contains(.,'E4B69E1C0A3A1BDC003C02F2')]/following-sibling::node()[1]").node();
+                pugi::xml_node nodeToAddTo = findOrMakeFolderSet( node, folders, "src");
+                nodeToAddTo.child("array").append_child("string").append_child(pugi::node_pcdata).set_value(UUID.c_str());
+                
+            } else if (folders[0] == "addons"){
+                
+                folders.erase(folders.begin());
+                pugi::xml_node node = doc.select_single_node("//key[contains(.,'BB4B014C10F69532006C3DED')]/following-sibling::node()[1]").node();
+                pugi::xml_node nodeToAddTo = findOrMakeFolderSet( node, folders, "addons");
+                nodeToAddTo.child("array").append_child("string").append_child(pugi::node_pcdata).set_value(UUID.c_str());
+                
+            } else {
+                
+                pugi::xml_node node = doc.select_single_node("//key[contains(.,'E4B69E1C0A3A1BDC003C02F2')]/following-sibling::node()[1]").node();
+                
+                // I'm not sure the best way to proceed;
+                // we should maybe find the rootest level and add it there. 
+                // TODO: fix this. 
+            }
+        }; 
         
     } else {
         
-        //pugi::xml_node array;
-        //findArrayForUUID("E4B69E200A3A1BDC003C02F2", array);       
-        //array.append_child("string").append_child(pugi::node_pcdata).set_value(buildUUID.c_str());
-
-        
+        /*
+        pugi::xml_node array;
+        findArrayForUUID("E4B69B580A3A1756003C02F2", array);       
+        array.append_child("string").append_child(pugi::node_pcdata).set_value(buildUUID.c_str());
+       */
     }
 } 
 
@@ -339,8 +390,7 @@ void xcodeProject::addSrc(string srcFile, string folder){
 
 void xcodeProject::addInclude(string includeName){
     
-    
-    
+
     char query[255];
     sprintf(query, "//key[contains(.,'baseConfigurationReference')]/parent::node()//key[contains(.,'HEADER_SEARCH_PATHS')]/following-sibling::node()[1]");
     pugi::xpath_node_set headerArray = doc.select_nodes(query);

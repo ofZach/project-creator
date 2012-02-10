@@ -21,11 +21,8 @@ public:
     void addLibrary(string libraryName);
 
 	void addAddon(ofAddon & addon);
-
-
     
-    pugi::xml_node findOrMakeFolderSet( vector < string > folders );
-    
+    pugi::xml_node findOrMakeFolderSet( pugi::xml_node nodeToAddTo, vector < string > folders, string pathForHash);
     
     
 	string getName();
@@ -38,6 +35,22 @@ public:
    bool findArrayForUUID(string UUID, pugi::xml_node & nodeMe);
     
 };
+
+
+
+
+/*
+ //http://code.google.com/p/pugixml/source/browse/trunk/docs/samples/modify_add.cpp
+ // this is how to add a tag with a value. 
+ pugi::xml_node descr = node.append_child("description");
+ descr.append_child(pugi::node_pcdata).set_value("Simple node");
+ */
+
+
+//  this gets the names of all PBXGroup "group" tags....
+//  not the ideal way to deal with folder tho. 
+//  string[contains(.,'&lt;group')]/parent::node()//string[contains(.,'PBXGroup')]/parent::node()//key[contains(.,'name')]/following-sibling::node()[1]
+
 
 
 
@@ -115,5 +128,41 @@ public:
 //        <string>-lpthread</string>
 //        </array>
 
+
+
+//  this is for SRC
+//  key[contains(.,"E4B69E1C0A3A1BDC003C02F2")]/following-sibling::node()[1]
+//  this is for addons
+//  key[contains(.,"BB4B014C10F69532006C3DED")]/following-sibling::node()[1]
+
+//  key[contains(.,"E4B69E1C0A3A1BDC003C02F2")]/following-sibling::node()[1]//array/string/text()
+//  E4B69E1F0A3A1BDC003C02F2
+// 
+//  gets you all keys for pbxgroups
+//  string[contains(.,'PBXGroup')]/parent::node()/preceding-sibling::node()[1]
+//  checks, does a group exist, for this key?
+//  string[contains(.,'PBXGroup')]/parent::node()/preceding-sibling::node()[1][contains(.,'BB4B014C10F69532006C3DED')]
+
+
+// does group exist
+// add group to group
+// add fileToGroup
+
+
+//bool xcodeProject::bDoesFileExist(string fileName, string fileType){
+//    
+//    // grab all the strings
+//    pugi::xpath_node_set source = doc.select_nodes("//string/text()");
+//    
+//    // if it equals something like "sourcecode.cpp.cpp" check the file name
+//    for (pugi::xpath_node_set::const_iterator it = source.begin(); it != source.end(); ++it){
+//        pugi::xpath_node node = *it;
+//        if (strcmp(node.node().value(), fileType.c_str()) == 0){
+//            pugi::xpath_node_set set = node.node().parent().parent().select_nodes("string[4]");
+//            set.begin()->node().first_child().value();
+//        }
+//    }
+//    return false;
+//}
 
 

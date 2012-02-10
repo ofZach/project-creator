@@ -22,15 +22,17 @@ void testApp::setup(){
 	vsProject.save(getOFRoot()+"/apps/testApp/testCreatorVS/testCreatorVS.vcxproj");
      */
 	//xcProject.load("xcode/emptyExample.xcodeproj/project_gotLinks.pbxproj");
+    
+    
 	xcProject.load("xcode/emptyExample.xcodeproj/project.pbxproj");
 	
-    xcProject.addSrc("src/newFile.h","src");
-    xcProject.addSrc("src/newFile.cpp","src");
+    xcProject.addSrc("src/newFile.h","src/test/of/src/adding");
+    xcProject.addSrc("src/newFile.cpp","addons/a/b/c/d/e");
     
     
-    xcProject.addInclude("../../../libs/blah");
-    xcProject.addLibrary("../../../libs/blahLib.a");
-	xcProject.save("xcode/emptyExample.xcodeproj/project2.pbxproj");
+    //xcProject.addInclude("../../../libs/blah");
+    //xcProject.addLibrary("../../../libs/blahLib.a");
+	xcProject.save("xcode/emptyExampleMod.xcodeproj/project.pbxproj");
 
 }
 

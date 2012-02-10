@@ -9,6 +9,110 @@
 		<string>42</string>
 		<key>objects</key>
 		<dict>
+			<key>fe4b26d32f629a0f288102446184c0ce</key>
+			<dict>
+				<key>children</key>
+				<array>
+					<string>dde48cdb8874f37d04827778c84ca458</string>
+				</array>
+				<key>isa</key>
+				<string>PBXGroup</string>
+				<key>name</key>
+				<string>e</string>
+				<key>sourceTree</key>
+				<string>&lt;group&gt;</string>
+			</dict>
+			<key>bb5f623d563c93a69ed66bb5aa93302d</key>
+			<dict>
+				<key>children</key>
+				<array>
+					<string>fe4b26d32f629a0f288102446184c0ce</string>
+				</array>
+				<key>isa</key>
+				<string>PBXGroup</string>
+				<key>name</key>
+				<string>d</string>
+				<key>sourceTree</key>
+				<string>&lt;group&gt;</string>
+			</dict>
+			<key>7aed8ead3ce13bd43f16d13dc4f92d7e</key>
+			<dict>
+				<key>children</key>
+				<array>
+					<string>bb5f623d563c93a69ed66bb5aa93302d</string>
+				</array>
+				<key>isa</key>
+				<string>PBXGroup</string>
+				<key>name</key>
+				<string>c</string>
+				<key>sourceTree</key>
+				<string>&lt;group&gt;</string>
+			</dict>
+			<key>b0de014c9abe71c4fd6ed3f459b1c09c</key>
+			<dict>
+				<key>children</key>
+				<array>
+					<string>7aed8ead3ce13bd43f16d13dc4f92d7e</string>
+				</array>
+				<key>isa</key>
+				<string>PBXGroup</string>
+				<key>name</key>
+				<string>b</string>
+				<key>sourceTree</key>
+				<string>&lt;group&gt;</string>
+			</dict>
+			<key>c5216ed98907f94a245bb4196f7a7f65</key>
+			<dict>
+				<key>children</key>
+				<array>
+					<string>b0de014c9abe71c4fd6ed3f459b1c09c</string>
+				</array>
+				<key>isa</key>
+				<string>PBXGroup</string>
+				<key>name</key>
+				<string>a</string>
+				<key>sourceTree</key>
+				<string>&lt;group&gt;</string>
+			</dict>
+			<key>f5b596a2fdac6eb10f89257539d3ecae</key>
+			<dict>
+				<key>children</key>
+				<array>
+					<string>c5216ed98907f94a245bb4196f7a7f65</string>
+				</array>
+				<key>isa</key>
+				<string>PBXGroup</string>
+				<key>name</key>
+				<string>sdsdf2</string>
+				<key>sourceTree</key>
+				<string>&lt;group&gt;</string>
+			</dict>
+			<key>3cd8f70f572eba374062a1bcc14b252e</key>
+			<dict>
+				<key>children</key>
+				<array>
+					<string>f5b596a2fdac6eb10f89257539d3ecae</string>
+				</array>
+				<key>isa</key>
+				<string>PBXGroup</string>
+				<key>name</key>
+				<string>temp</string>
+				<key>sourceTree</key>
+				<string>&lt;group&gt;</string>
+			</dict>
+			<key>71834f65f3a9211e73b8dc8563776aec</key>
+			<dict>
+				<key>children</key>
+				<array>
+					<string>3cd8f70f572eba374062a1bcc14b252e</string>
+				</array>
+				<key>isa</key>
+				<string>PBXGroup</string>
+				<key>name</key>
+				<string>yo</string>
+				<key>sourceTree</key>
+				<string>&lt;group&gt;</string>
+			</dict>
 			<key>70f1d6d8ccd0d4a18886c0083897d044</key>
 			<dict>
 				<key>fileRef</key>
@@ -25,11 +129,50 @@
 				<key>isa</key>
 				<string>PBXFileReference</string>
 				<key>name</key>
-				<string>src/newFile.cpp</string>
+				<string>newFile.cpp</string>
 				<key>path</key>
-				<string>src/src/newFile.cpp</string>
+				<string>src/newFile.cpp</string>
 				<key>sourceTree</key>
 				<string>SOURCE_ROOT</string>
+			</dict>
+			<key>409aed7da62e26b48d21b79cc50f169f</key>
+			<dict>
+				<key>children</key>
+				<array>
+					<string>f803d251c02a3bc294a29a60f11f47e4</string>
+				</array>
+				<key>isa</key>
+				<string>PBXGroup</string>
+				<key>name</key>
+				<string>wah</string>
+				<key>sourceTree</key>
+				<string>&lt;group&gt;</string>
+			</dict>
+			<key>cc41e165b11ead1b27b9af3dc9899d75</key>
+			<dict>
+				<key>children</key>
+				<array>
+					<string>409aed7da62e26b48d21b79cc50f169f</string>
+				</array>
+				<key>isa</key>
+				<string>PBXGroup</string>
+				<key>name</key>
+				<string>temp</string>
+				<key>sourceTree</key>
+				<string>&lt;group&gt;</string>
+			</dict>
+			<key>47d85205419e88986e15467e528adf85</key>
+			<dict>
+				<key>children</key>
+				<array>
+					<string>cc41e165b11ead1b27b9af3dc9899d75</string>
+				</array>
+				<key>isa</key>
+				<string>PBXGroup</string>
+				<key>name</key>
+				<string>yo</string>
+				<key>sourceTree</key>
+				<string>&lt;group&gt;</string>
 			</dict>
 			<key>f803d251c02a3bc294a29a60f11f47e4</key>
 			<dict>
@@ -40,16 +183,18 @@
 				<key>isa</key>
 				<string>PBXFileReference</string>
 				<key>name</key>
-				<string>src/newFile.h</string>
+				<string>newFile.h</string>
 				<key>path</key>
-				<string>src/src/newFile.h</string>
+				<string>src/newFile.h</string>
 				<key>sourceTree</key>
 				<string>SOURCE_ROOT</string>
 			</dict>
 			<key>BB4B014C10F69532006C3DED</key>
 			<dict>
 				<key>children</key>
-				<array />
+				<array>
+					<string>71834f65f3a9211e73b8dc8563776aec</string>
+				</array>
 				<key>isa</key>
 				<string>PBXGroup</string>
 				<key>name</key>
@@ -160,7 +305,7 @@
 				<key>isa</key>
 				<string>PBXReferenceProxy</string>
 				<key>path</key>
-				<string>openFrameworksDebug.a</string>
+				<string>openFrameworks.a</string>
 				<key>remoteRef</key>
 				<string>E4328147138ABC890047C5CB</string>
 				<key>sourceTree</key>
@@ -477,24 +622,10 @@
 					<string>NO</string>
 					<key>GCC_WARN_UNUSED_VARIABLE</key>
 					<string>NO</string>
-					<key>HEADER_SEARCH_PATHS</key>
-					<array>
-						<string>../../../includeTest.h</string>
-						<string>$(OF_CORE_HEADERS)</string>
-						<string>../../../libs/blah</string>
-					</array>
-					<key>LIBRARY_SEARCH_PATHS</key>
-					<string>../../../librarySearchPath</string>
 					<key>OTHER_CPLUSPLUSFLAGS</key>
 					<array>
 						<string>-D__MACOSX_CORE__</string>
 						<string>-lpthread</string>
-					</array>
-					<key>OTHER_LDFLAGS</key>
-					<array>
-						<string>testLib.a</string>
-						<string>$(OF_CORE_LIBS)</string>
-						<string>../../../libs/blahLib.a</string>
 					</array>
 				</dict>
 				<key>isa</key>
@@ -544,24 +675,10 @@
 					<string>NO</string>
 					<key>GCC_WARN_UNUSED_VARIABLE</key>
 					<string>NO</string>
-					<key>HEADER_SEARCH_PATHS</key>
-					<array>
-						<string>../../../includeTest.h</string>
-						<string>$(OF_CORE_HEADERS)</string>
-						<string>../../../libs/blah</string>
-					</array>
-					<key>LIBRARY_SEARCH_PATHS</key>
-					<string>../../../librarySearchPath</string>
 					<key>OTHER_CPLUSPLUSFLAGS</key>
 					<array>
 						<string>-D__MACOSX_CORE__</string>
 						<string>-lpthread</string>
-					</array>
-					<key>OTHER_LDFLAGS</key>
-					<array>
-						<string>testLib.a</string>
-						<string>$(OF_CORE_LIBS)</string>
-						<string>../../../libs/blahLib.a</string>
 					</array>
 				</dict>
 				<key>isa</key>
@@ -630,7 +747,7 @@
 				<key>isa</key>
 				<string>PBXNativeTarget</string>
 				<key>name</key>
-				<string>graphicsExample</string>
+				<string>eventsExample</string>
 				<key>productName</key>
 				<string>myOFApp</string>
 				<key>productReference</key>
@@ -647,7 +764,7 @@
 				<key>isa</key>
 				<string>PBXFileReference</string>
 				<key>path</key>
-				<string>graphicsExampleDebug.app</string>
+				<string>eventsExampleDebug.app</string>
 				<key>sourceTree</key>
 				<string>BUILT_PRODUCTS_DIR</string>
 			</dict>
@@ -882,6 +999,7 @@
 					<string>E4B69E1D0A3A1BDC003C02F2</string>
 					<string>E4B69E1E0A3A1BDC003C02F2</string>
 					<string>E4B69E1F0A3A1BDC003C02F2</string>
+					<string>47d85205419e88986e15467e528adf85</string>
 				</array>
 				<key>isa</key>
 				<string>PBXGroup</string>
