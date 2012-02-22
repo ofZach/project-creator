@@ -7,6 +7,8 @@ class visualStudioProject : public baseProject {
     
 public: 
     
+    void setup();
+    
     bool load(string path);
     bool create(string path);
 	bool save(string path);

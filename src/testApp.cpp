@@ -5,8 +5,8 @@
 void testApp::setup(){
 	
     
-    /*setOFRoot("/home/arturo/Escritorio/openFrameworks");
-
+    setOFRoot("/Users/molmol/Desktop/of_preRelease_v007_osx");
+/*
 	ofSetLogLevel(CBLinuxProject::LOG_NAME,OF_LOG_VERBOSE);
 	linuxProject.create(getOFRoot()+"/apps/testApp/testCreatorLinux");
 	ofAddon addon(getOFRoot()+"/addons/ofxOpenCv","linux");
@@ -24,15 +24,19 @@ void testApp::setup(){
 	//xcProject.load("xcode/emptyExample.xcodeproj/project_gotLinks.pbxproj");
     
     
-	xcProject.load("xcode/emptyExample.xcodeproj/project.pbxproj");
+    xcProject.setup();
+	//xcProject.load("xcode/emptyExample.xcodeproj/project.pbxproj");
 	
-    xcProject.addSrc("src/newFile.h","src/test/of/src/adding");
-    xcProject.addSrc("src/newFile.cpp","addons/a/b/c/d/e");
+    //xcProject.addSrc("src/newFile.h","src/test/of/src/adding");
+    //xcProject.addSrc("src/newFile.cpp","addons/a/b/c/d/e");
     
-    
+    xcProject.create("test/test1");
+    ofAddon addon;
+    addon.fromFS(ofToDataPath(getOFRoot()+ "/addons/ofxOpenCv"),"osx");
+    xcProject.addAddon(addon);
     //xcProject.addInclude("../../../libs/blah");
     //xcProject.addLibrary("../../../libs/blahLib.a");
-	xcProject.save("xcode/emptyExampleMod.xcodeproj/project.pbxproj");
+	//xcProject.save("xcode/emptyExampleMod.xcodeproj/project.pbxproj");
 
 }
 
@@ -42,6 +46,8 @@ void testApp::setup(){
 //--------------------------------------------------------------
 void testApp::update(){
 
+    
+   
 }
 
 //--------------------------------------------------------------

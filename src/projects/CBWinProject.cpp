@@ -12,6 +12,11 @@
 
 string CBWinProject::LOG_NAME = "CBWinProject";
 
+
+void CBWinProject::setup(){
+    
+}
+
 CBWinProject::CBWinProject() {
 
 }

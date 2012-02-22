@@ -7,6 +7,9 @@
 string visualStudioProject::LOG_NAME = "visualStudioProjectFile";
 
 
+void visualStudioProject::setup(){
+    
+}
 
 bool visualStudioProject::load(string path){
 	projectDir = ofFilePath::addLeadingSlash(path);

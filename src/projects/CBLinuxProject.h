@@ -15,7 +15,10 @@
 
 class CBLinuxProject: public baseProject {
 public:
-	CBLinuxProject();
+	
+    void setup();
+    
+    CBLinuxProject();
 
 	bool load(string path);
 	bool create(string path);

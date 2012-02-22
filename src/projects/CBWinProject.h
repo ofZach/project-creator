@@ -15,7 +15,11 @@
 
 class CBWinProject: public baseProject  {
 public:
-	CBWinProject();
+	
+    
+    void setup();
+    
+    CBWinProject();
 
 	bool load(string path);
 	bool create(string path);

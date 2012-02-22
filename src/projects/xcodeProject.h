@@ -12,8 +12,11 @@ public:
     
     xcodeProject(){};
     
+    
+    void setup();
+    
     bool load(string path);
-    bool create(string path){}; // not done yet. 
+    bool create(string path); // not done yet. 
 	bool save(string path);
 
     void addSrc(string srcFile, string folder);
@@ -31,6 +34,17 @@ public:
     
     pugi::xml_node insertPoint;         // where are we inserting items (at the second dict tag,
                                         // /plist[1]/dict[1]/dict[2])
+    
+    
+    void renameProject();
+    
+    
+    
+    string projectDir, projectName;
+    vector<ofAddon> addons;
+    void parseAddons();
+    static string LOG_NAME;
+    
     
    bool findArrayForUUID(string UUID, pugi::xml_node & nodeMe);
     

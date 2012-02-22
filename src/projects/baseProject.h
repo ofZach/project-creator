@@ -16,6 +16,8 @@ class baseProject {
     };
     virtual ~baseProject(){};
     
+    virtual void setup() = 0;
+    
     virtual bool create(string path) = 0;
     virtual bool load(string path) = 0;
     virtual bool save(string path) = 0;
@@ -33,6 +35,9 @@ class baseProject {
 
     pugi::xml_document doc;
     bool bLoaded;
+    
+    string templatePath;
+    
     
 };
 

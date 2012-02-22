@@ -12,6 +12,11 @@
 
 string CBLinuxProject::LOG_NAME = "CBLinuxProject";
 
+
+void CBLinuxProject::setup() {
+    
+}
+
 CBLinuxProject::CBLinuxProject() {
 
 }
