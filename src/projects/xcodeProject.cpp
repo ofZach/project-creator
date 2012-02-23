@@ -120,36 +120,88 @@ void xcodeProject::parseAddons(){
 bool xcodeProject::create(string path){
     
     projectDir = ofFilePath::addTrailingSlash(path);
-	ofLogVerbose(LOG_NAME) << "project dir:" << projectDir;
 	projectName = ofFilePath::getFileName(path);
-	ofLogVerbose(LOG_NAME) << "project name:" << projectName;
-	ofFile project(projectDir + projectName + ".xcodeproj");    // this is a directory, really?
-	if(!project.exists()){
-		ofLogVerbose(LOG_NAME) << "creating non existent project";
-		ofDirectory dir(projectDir);
-		dir.create(true);
-		ofFile::copyFromTo(templatePath + "/src",projectDir);
-		ofFile::copyFromTo(templatePath + "/bin",projectDir);
-		ofFile::copyFromTo(templatePath + "/emptyExample.xcodeproj", projectDir);
+	
+    //cout << "project dir:" << projectDir;
+    //cout << "project name:" << projectName;
+    
+    bool bDoesDirExist = false;
+    
+    ofDirectory project(projectDir);    // this is a directory, really?
+	if(project.exists()){
+        bDoesDirExist = true;
+    }
+    
+    if (!bDoesDirExist){
+    
+        ofFile project(projectDir + projectName + ".xcodeproj");    // this is a directory, really?
+        
+        if(!project.exists()){
+            ofLogVerbose(LOG_NAME) << "creating non existent project";
+            ofDirectory dir(projectDir);
+            dir.create(true);
+            ofFile::copyFromTo(templatePath + "/src",projectDir);
+            ofFile::copyFromTo(templatePath + "/bin",projectDir);
+            ofFile::copyFromTo(templatePath + "/emptyExample.xcodeproj", projectDir);
+            ofFile::copyFromTo(templatePath + "/openFrameworks-Info.plist", projectDir);
+            ofFile::copyFromTo(templatePath + "/Project.xcconfig", projectDir);
+            load(projectDir + "emptyExample.xcodeproj/project.pbxproj");
+            renameProject();
+            string xcodeProject = projectDir + "/" + projectName + ".xcodeproj";
+            ofDirectory xcodeDir(xcodeProject);
+            xcodeDir.create(true);
+            save(projectDir + "/" + projectName + ".xcodeproj" + "/project.pbxproj");
+            ofDirectory::removeDirectory(projectDir + "/emptyExample.xcodeproj", true);
+        } else {
+            // this exists, what to do now?  (load and parse?)
+        }
+        
+    } else {
+        printf("this exists ! \n");
+        vector < string > fileNames;
+       
+        getFilesRecursively(projectDir + "src", fileNames);
+        
+        ofFile::copyFromTo(templatePath + "/emptyExample.xcodeproj", projectDir);
         ofFile::copyFromTo(templatePath + "/openFrameworks-Info.plist", projectDir);
         ofFile::copyFromTo(templatePath + "/Project.xcconfig", projectDir);
+        
+        load(projectDir + "emptyExample.xcodeproj/project.pbxproj");
+        renameProject();
+        
+        string xcodeProject = projectDir + "/" + projectName + ".xcodeproj";
+        ofDirectory xcodeDir(xcodeProject);
+        xcodeDir.create(true);
+        save(projectDir + "/" + projectName + ".xcodeproj" + "/project.pbxproj");
+        
+        
+        if (projectName != "emptyExample"){
+            ofDirectory::removeDirectory(projectDir + "/emptyExample.xcodeproj", true);
+        }
+        
+        for (int i = 0; i < fileNames.size(); i++){
+            
+            string first, last;
+            splitFromFirst(fileNames[i],projectName, first, last);  
+            
+            // last is now something like " /src/main.cpp"
+            // drop the trailing slash;
+            last.erase(last.begin());
+            
+            string fileName = last;
+            splitFromLast(fileName,"/", first, last);  
+            
+            if (fileName != "src/testApp.cpp" &&
+                fileName != "src/testApp.h" &&
+                fileName != "src/main.cpp"){
+                    addSrc(fileName, first);
+            }
+        }
+        
+        
+        
+        
     }
-	//parseAddons();
-	
-    load(projectDir + "emptyExample.xcodeproj/project.pbxproj");
-    
-    //addSrc("blah.h","src/blah1");
-    // do something. 
-    
-    renameProject();
-    
-    string xcodeProject = projectDir + "/" + projectName + ".xcodeproj";
-    ofDirectory dir(xcodeProject);
-    dir.create(true);
-    
-   // ofDirectory::removeDirectory(projectDir + "/emptyExample.xcodeproj", true);
-    
-    save(projectDir + "/" + projectName + ".xcodeproj" + "/project.pbxproj");
     return bLoaded;
     
     
@@ -220,7 +272,7 @@ string generateUUID(string input){
 
 
 
-pugi::xml_node xcodeProject::findOrMakeFolderSet(pugi::xml_node nodeToAddTo, vector < string > folders, string pathForHash){
+pugi::xml_node xcodeProject::findOrMakeFolderSet(pugi::xml_node nodeToAddTo, vector < string > & folders, string pathForHash){
     
     
     
@@ -233,7 +285,6 @@ pugi::xml_node xcodeProject::findOrMakeFolderSet(pugi::xml_node nodeToAddTo, vec
     pugi::xml_node nodeWithThisName;
     string name = folders[0];
     
-    //cout << "trying to find name " << name << endl;
     
     for (pugi::xpath_node_set::const_iterator it = array.begin(); it != array.end(); ++it){
         
@@ -248,7 +299,7 @@ pugi::xml_node xcodeProject::findOrMakeFolderSet(pugi::xml_node nodeToAddTo, vec
         if (doc.select_single_node(querypbx).node() != NULL){
             
             if (strcmp(doc.select_single_node(querypbx).node().first_child().value(), folders[0].c_str()) == 0){
-                
+                printf("found matching node \n");
                 bAnyNodeWithThisName = true;
                 nodeWithThisName = doc.select_single_node(querypbx).node().parent();
             }
@@ -265,9 +316,7 @@ pugi::xml_node xcodeProject::findOrMakeFolderSet(pugi::xml_node nodeToAddTo, vec
         
     }
     
-    //cout << bAnyNodeWithThisName << endl;
-    
-
+   
     
     // now, if we have a pbxgroup with the right name, pop this name off the folder set, and keep going. 
     // else, let's add a folder set, boom. 
@@ -294,8 +343,6 @@ pugi::xml_node xcodeProject::findOrMakeFolderSet(pugi::xml_node nodeToAddTo, vec
         doc.select_single_node("/plist[1]/dict[1]/dict[2]").node().prepend_copy(pbxDoc.first_child()); 
         
         
-        //printf(".......  ? \n");
-        //nodeWithThisName.print(std::cout);
         
         // add to array
         char queryArray[255];
@@ -304,6 +351,9 @@ pugi::xml_node xcodeProject::findOrMakeFolderSet(pugi::xml_node nodeToAddTo, vec
         //array.begin()->node().parent().append_child("string").append_child(pugi::node_pcdata).set_value(UUID.c_str());
         
         
+    } else {
+        
+        pathForHash += "/" + folders[0];
     }
     
     
@@ -429,7 +479,6 @@ void xcodeProject::addSrc(string srcFile, string folder){
         
         vector < string > folders = ofSplitString(folder, "/", true);
         
-        
         if (folders.size() > 1){
             if (folders[0] == "src"){
                 
@@ -443,6 +492,7 @@ void xcodeProject::addSrc(string srcFile, string folder){
                 folders.erase(folders.begin());
                 pugi::xml_node node = doc.select_single_node("//key[contains(.,'BB4B014C10F69532006C3DED')]/following-sibling::node()[1]").node();
                 pugi::xml_node nodeToAddTo = findOrMakeFolderSet( node, folders, "addons");
+                
                 nodeToAddTo.child("array").append_child("string").append_child(pugi::node_pcdata).set_value(UUID.c_str());
                 
             } else {
@@ -457,11 +507,12 @@ void xcodeProject::addSrc(string srcFile, string folder){
         
     } else {
         
-        /*
+        
         pugi::xml_node array;
-        findArrayForUUID("E4B69B580A3A1756003C02F2", array);       
-        array.append_child("string").append_child(pugi::node_pcdata).set_value(buildUUID.c_str());
-       */
+        pugi::xml_node node = doc.select_single_node("//key[contains(.,'E4B69E1C0A3A1BDC003C02F2')]/following-sibling::node()[1]").node();
+        node.child("array").append_child("string").append_child(pugi::node_pcdata).set_value(UUID.c_str());
+        //nodeToAddTo.child("array").append_child("string").append_child(pugi::node_pcdata).set_value(UUID.c_str());
+        
     }
     
     
@@ -480,7 +531,6 @@ void xcodeProject::addInclude(string includeName){
     pugi::xpath_node_set headerArray = doc.select_nodes(query);
 
     if (headerArray.size() > 0){
-        //cout << "adding header " << endl;
         
         for (pugi::xpath_node_set::const_iterator it = headerArray.begin(); it != headerArray.end(); ++it){
             pugi::xpath_node node = *it;
@@ -499,7 +549,7 @@ void xcodeProject::addInclude(string includeName){
         for (pugi::xpath_node_set::const_iterator it = dictArray.begin(); it != dictArray.end(); ++it){
             pugi::xpath_node node = *it;
             
-            node.node().print(std::cout);
+            //node.node().print(std::cout);
             string headerXML = string(HeaderSearchPath);
             pugi::xml_document headerDoc;
             pugi::xml_parse_result result = headerDoc.load_buffer(headerXML.c_str(), strlen(headerXML.c_str()));
@@ -530,20 +580,16 @@ void xcodeProject::addLibrary(string libraryName){
     
     
     if (headerArray.size() > 0){
-        //cout << "adding library! " << endl;
         
         for (pugi::xpath_node_set::const_iterator it = headerArray.begin(); it != headerArray.end(); ++it){
             
             pugi::xpath_node node = *it;
-            //cout << node.node() << endl;
-            //node.node().print(std::cout);
             node.node().append_child("string").append_child(pugi::node_pcdata).set_value(libraryName.c_str());
-            //node.node().print(std::cout);
         }
         
     } else {
         
-        printf("we don't have OTHER_LDFLAGS, so we're adding them... and calling this function again \n");
+        //printf("we don't have OTHER_LDFLAGS, so we're adding them... and calling this function again \n");
         query[255];
         sprintf(query, "//key[contains(.,'baseConfigurationReference')]/parent::node()//key[contains(.,'buildSettings')]/following-sibling::node()[1]");
         
@@ -575,34 +621,22 @@ void xcodeProject::addLibrary(string libraryName){
 void xcodeProject::addAddon(ofAddon & addon){
     
     for(int i=0;i<(int)addon.includePaths.size();i++){
-		//cout << "addInclude " << addon.includePaths[i] << endl;
-        
-        addInclude(addon.includePaths[i]);
+		addInclude(addon.includePaths[i]);
 	}
     
 	for(int i=0;i<(int)addon.libs.size();i++){
-        
-        
-        //cout << "addLibrary " << addon.libs[i] << endl;
-        
 		addLibrary(addon.libs[i]);
-       
 	}
     
 	for(int i=0;i< addon.srcFiles.size(); i++){
-        
-        //cout << "addSrc " << addon.srcFiles[i] << " " << addon.filesToFolders[addon.srcFiles[i]] << endl;
-        
-
-        
-		addSrc(addon.srcFiles[i],addon.filesToFolders[addon.srcFiles[i]]);
+        addSrc(addon.srcFiles[i],addon.filesToFolders[addon.srcFiles[i]]);
 	}
 }
 
 string xcodeProject::getName(){
-
+    return projectName;
 }
 
 string xcodeProject::getPath(){
-
+    return projectDir;
 }

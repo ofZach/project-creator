@@ -25,7 +25,7 @@ public:
 
 	void addAddon(ofAddon & addon);
     
-    pugi::xml_node findOrMakeFolderSet( pugi::xml_node nodeToAddTo, vector < string > folders, string pathForHash);
+    pugi::xml_node findOrMakeFolderSet( pugi::xml_node nodeToAddTo, vector < string > & folders, string pathForHash);
     
     
 	string getName();

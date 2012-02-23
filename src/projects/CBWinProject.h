@@ -17,6 +17,7 @@ class CBWinProject: public baseProject  {
 public:
 	
     
+    //
     void setup();
     
     CBWinProject();

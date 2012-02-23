@@ -21,10 +21,14 @@ ofAddon::ofAddon(string path, string platform){
 }
 
 void ofAddon::fromFS(string path, string platform){
-	clear();
+	
+    clear();
 	name = ofFilePath::getFileName(path);
 
     string filePath = path + "/src";
+    
+    
+    cout << "in fromFS, trying src " << filePath << endl;
     getFilesRecursively(filePath, srcFiles);
 
     for(int i=0;i<(int)srcFiles.size();i++){
@@ -59,32 +63,43 @@ void ofAddon::fromFS(string path, string platform){
     	libs[i] = "../../.." + libs[i];
     }
 
+    
     // get a unique list of the paths that are needed for the includes.
-
     list < string > paths;
     for (int i = 0; i < (int)srcFiles.size(); i++){
         size_t found;
         found = srcFiles[i].find_last_of("/");
         paths.push_back(srcFiles[i].substr(0,found));
     }
+    
+    // get every folder in addon/src and addon/libs
+    
+    vector < string > libFolders;
+    cout << "trying get folders recursively " << (path + "/libs") << endl;
+    getFoldersRecursively(path + "/libs", libFolders);
+    
+    vector < string > srcFolders;
+    getFoldersRecursively(path + "/src", srcFolders);
+    
+    for (int i = 0; i < libFolders.size(); i++){
+        libFolders[i].erase (libFolders[i].begin(), libFolders[i].begin()+getOFRoot().length());
+        libFolders[i] = "../../.." + libFolders[i];
+        paths.push_back(libFolders[i]);
+    }
+    
+    for (int i = 0; i < srcFolders.size(); i++){
+        srcFolders[i].erase (srcFolders[i].begin(), srcFolders[i].begin()+getOFRoot().length());
+        srcFolders[i] = "../../.." + srcFolders[i];
+        paths.push_back(srcFolders[i]);
+    }
+    
+    
     paths.sort();
     paths.unique();
     for (list<string>::iterator it=paths.begin(); it!=paths.end(); ++it){
         includePaths.push_back(*it);
     }
 
-    /*
-    printf("------------------------- manual (%s) \n", path.c_str());
-    for (int i = 0; i < addon.srcFilesToAdd.size(); i++){
-        cout << "src --- " << addon.srcFilesToAdd[i] <<endl;
-    }
-    for (int i = 0; i < addon.libsToAdd.size(); i++){
-        cout << "libs --- " <<  addon.libsToAdd[i] <<endl;
-    }
-    for (int i = 0; i < addon.includePathsToAdd.size(); i++){
-        cout << "include paths ---- " << addon.includePathsToAdd[i] << endl;
-    }
-    */
 }
 
 void ofAddon::fromXML(string installXmlName){

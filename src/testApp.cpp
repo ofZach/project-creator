@@ -5,39 +5,40 @@
 void testApp::setup(){
 	
     
-    setOFRoot("/Users/molmol/Desktop/of_preRelease_v007_osx");
-/*
-	ofSetLogLevel(CBLinuxProject::LOG_NAME,OF_LOG_VERBOSE);
-	linuxProject.create(getOFRoot()+"/apps/testApp/testCreatorLinux");
-	ofAddon addon(getOFRoot()+"/addons/ofxOpenCv","linux");
-	linuxProject.addAddon(addon);
+    setOFRoot("../../../../../");
 
-	winProject.create(getOFRoot()+"/apps/testApp/testCreatorWin");
-	addon.fromFS(getOFRoot()+"/addons/ofxOpenCv","win_cb");
-	winProject.addAddon(addon);
+    printf("generating examples \n");
+    generateExamples();
+    printf("finished generating examples \n");
+    
 
-	vsProject.create(getOFRoot()+"/apps/testApp/testCreatorVS");
-	addon.fromFS(getOFRoot()+"/addons/ofxOpenCv","vs2010");
-	vsProject.addAddon(addon);
-	vsProject.save(getOFRoot()+"/apps/testApp/testCreatorVS/testCreatorVS.vcxproj");
-     */
-	//xcProject.load("xcode/emptyExample.xcodeproj/project_gotLinks.pbxproj");
-    
-    
-    xcProject.setup();
-	//xcProject.load("xcode/emptyExample.xcodeproj/project.pbxproj");
-	
-    //xcProject.addSrc("src/newFile.h","src/test/of/src/adding");
-    //xcProject.addSrc("src/newFile.cpp","addons/a/b/c/d/e");
-    
-    xcProject.create("test/test1");
-    ofAddon addon;
-    addon.fromFS(ofToDataPath(getOFRoot()+ "/addons/ofxOpenCv"),"osx");
-    xcProject.addAddon(addon);
-    //xcProject.addInclude("../../../libs/blah");
-    //xcProject.addLibrary("../../../libs/blahLib.a");
-	//xcProject.save("xcode/emptyExampleMod.xcodeproj/project.pbxproj");
+}
 
+void testApp::generateExamples(){
+    
+    ofDirectory dir;
+    dir.listDir("../../../../../examples");
+    
+    for (int i = 0; i < dir.size(); i++){
+        
+        if (dir.getName(i) == "android" || dir.getName(i) == "ios") continue;
+        
+        ofDirectory subdir;
+        subdir.listDir(dir.getPath(i));
+        
+        for (int j = 0; j < subdir.size(); j++){
+            xcProject.setup();
+            xcProject.create(subdir.getPath(j));
+            vector < string > addons;
+            parseAddonsDotMake(xcProject.getPath() + "addons.make", addons);
+            for (int i = 0; i < addons.size(); i++){
+                ofAddon addon;
+                addon.fromFS(getOFRoot()+ "/addons/" + addons[i],"osx");
+                xcProject.addAddon(addon);
+            }
+        }
+    }
+    
 }
 
 
@@ -99,30 +100,3 @@ void testApp::gotMessage(ofMessage msg){
 void testApp::dragEvent(ofDragInfo dragInfo){ 
 
 }
-
-
-// use XPATH expressions
-
-/*
- cout << "--------------- source: " << endl;
- pugi::xpath_node_set source = doc.select_nodes("//Unit");
- for (pugi::xpath_node_set::const_iterator it = source.begin(); it != source.end(); ++it){
- pugi::xpath_node node = *it;
- std::cout << " " << node.node().attribute("filename").value() << endl;
- }
- 
- cout << "--------------- includes: " << endl;
- pugi::xpath_node_set add = doc.select_nodes("//Add[@directory]");
- for (pugi::xpath_node_set::const_iterator it = add.begin(); it != add.end(); ++it){
- pugi::xpath_node node = *it;
- std::cout << "directory: " << node.node().attribute("directory").value() << endl;
- }
- 
- cout << "--------------- linking: " << endl;
- add = doc.select_nodes("//Add[@library]");
- for (pugi::xpath_node_set::const_iterator it = add.begin(); it != add.end(); ++it){
- pugi::xpath_node node = *it;
- std::cout << "library: " << node.node().attribute("library").value() << endl;
- }
- */
-

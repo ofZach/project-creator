@@ -63,18 +63,23 @@ pugi::xml_node appendValue(pugi::xml_document & doc, string tag, string attribut
 
 }
 
-
+// todo -- this doesn't use ofToDataPath -- so it's broken a bit.  can we fix?
 void getFilesRecursively(const string & path, vector < string > & fileNames){
-
-        DirectoryIterator end;
-        for (DirectoryIterator it(path); it != end; ++it){
-            if (!it->isDirectory()){
-                fileNames.push_back(it->path());
-            }
-            if (it->isDirectory()){
-                getFilesRecursively(it->path(), fileNames);
-            }
+    
+    ofDirectory dir;
+    
+    cout << "in getFilesRecursively "<< path << endl;
+    
+    dir.listDir(path);
+    for (int i = 0; i < dir.size(); i++){
+        ofFile temp(dir.getFile(i));
+        if (temp.isFile()){
+            fileNames.push_back(dir.getPath(i));
+        } else if (temp.isDirectory()){
+            getFilesRecursively(dir.getPath(i), fileNames);
         }
+    }    
+    //folderNames.push_back(path);
 
 }
 
@@ -84,38 +89,101 @@ void splitFromLast(string toSplit, string deliminator, string & first, string & 
     second = toSplit.substr(found+1);
 }
 
+void splitFromFirst(string toSplit, string deliminator, string & first, string & second){
+    size_t found = toSplit.find(deliminator.c_str());
+    first = toSplit.substr(0,found );
+    second = toSplit.substr(found+deliminator.size());
+}
+
+
+void getFoldersRecursively(const string & path, vector < string > & folderNames){
+    ofDirectory dir;
+    dir.listDir(path);
+    for (int i = 0; i < dir.size(); i++){
+        ofFile temp(dir.getFile(i));
+        if (temp.isDirectory()){
+            getFoldersRecursively(dir.getPath(i), folderNames);
+        }
+    }    
+    folderNames.push_back(path);
+}
+
+
 
 void getLibsRecursively(const string & path, vector < string > & libFiles, vector < string > & libLibs, string platform ){
-       DirectoryIterator end;
-        for (DirectoryIterator it(path); it != end; ++it){
-            if (!it->isDirectory()){
-            	string ext = ofFilePath::getFileExt(it->path());
-            	vector<string> splittedPath = ofSplitString(ofFilePath::getEnclosingDirectory(it->path()),"/");
-
-                if (ext == "a" || ext == "lib" || ext == "dylib" || ext == "so"){
-
-                	if(platform!=""){
-                		bool platformFound = false;
-                		for(int i=0;i<(int)splittedPath.size();i++){
-                			if(splittedPath[i]==platform){
-                				platformFound = true;
-                				break;
-                			}
-                		}
-                		if(!platformFound){
-                			continue;
-                		}
-                	}
-                    libLibs.push_back(it->path());
-                } else if (ext == "h" || ext == "hpp" || ext == "c" || ext == "cpp" || ext == "cc"){
-                    libFiles.push_back(it->path());
+       
+    
+    ofDirectory dir;
+    dir.listDir(path);
+    for (int i = 0; i < dir.size(); i++){
+        ofFile temp(dir.getFile(i));
+        if (temp.isDirectory()){
+            //getLibsRecursively(dir.getPath(i), folderNames);
+            getLibsRecursively(dir.getPath(i), libFiles, libLibs, platform);
+            
+        } else {
+            
+            //string ext = ofFilePath::getFileExt(temp.getFile(i));
+            string ext;
+            string first;
+            splitFromLast(dir.getPath(i), ".", first, ext);
+            
+            
+            vector<string> splittedPath = ofSplitString(dir.getPath(i),"/");
+            if (ext == "a" || ext == "lib" || ext == "dylib" || ext == "so"){
+                
+                if(platform!=""){
+                    bool platformFound = false;
+                    for(int i=0;i<(int)splittedPath.size();i++){
+                        if(splittedPath[i]==platform){
+                            platformFound = true;
+                            break;
+                        }
+                    }
+                    if(!platformFound){
+                        continue;
+                    }
                 }
-            }
-
-            if (it->isDirectory()){
-                getLibsRecursively(it->path(), libFiles, libLibs, platform);
+                libLibs.push_back(dir.getPath(i));
+            } else if (ext == "h" || ext == "hpp" || ext == "c" || ext == "cpp" || ext == "cc"){
+                libFiles.push_back(dir.getPath(i));
             }
         }
+    }    
+   //folderNames.push_back(path);
+    
+    
+    
+//    DirectoryIterator end;
+//        for (DirectoryIterator it(path); it != end; ++it){
+//            if (!it->isDirectory()){
+//            	string ext = ofFilePath::getFileExt(it->path());
+//            	vector<string> splittedPath = ofSplitString(ofFilePath::getEnclosingDirectory(it->path()),"/");
+//
+//                if (ext == "a" || ext == "lib" || ext == "dylib" || ext == "so"){
+//
+//                	if(platform!=""){
+//                		bool platformFound = false;
+//                		for(int i=0;i<(int)splittedPath.size();i++){
+//                			if(splittedPath[i]==platform){
+//                				platformFound = true;
+//                				break;
+//                			}
+//                		}
+//                		if(!platformFound){
+//                			continue;
+//                		}
+//                	}
+//                    libLibs.push_back(it->path());
+//                } else if (ext == "h" || ext == "hpp" || ext == "c" || ext == "cpp" || ext == "cc"){
+//                    libFiles.push_back(it->path());
+//                }
+//            }
+//
+//            if (it->isDirectory()){
+//                getLibsRecursively(it->path(), libFiles, libLibs, platform);
+//            }
+//        }
 
 }
 
@@ -145,4 +213,23 @@ string getOFRoot(){
 
 void setOFRoot(string path){
 	OFRoot = path;
+}
+
+void parseAddonsDotMake(string path, vector < string > & addons){
+    
+    addons.clear();
+	ofFile addonsmake(path);
+	if(!addonsmake.exists()){
+		return;
+	}
+	ofBuffer addonsmakebuff;
+	addonsmake >> addonsmakebuff;
+	while(!addonsmakebuff.isLastLine() && addonsmakebuff.size() > 0){
+        string line = addonsmakebuff.getNextLine();
+        cout <<line <<endl;
+		
+		if(line!=""){
+			addons.push_back(line);
+		}
+	}
 }
